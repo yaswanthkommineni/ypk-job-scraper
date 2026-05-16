@@ -5,6 +5,8 @@
 > **If you are an agent reading this file**, understand that this project is **still in the developing phase**. Read through the sections below to understand the purpose, architecture, and current state of the pipeline. Not everything is finalized — some decisions are pending. Use this document as the source of truth for what the project aims to do and how it is structured.
 >
 > **Important:** Since this project is actively under development, you should **update this context file** whenever you make changes that affect the architecture, pipeline steps, configuration, or any pending decisions. Keep this document in sync with the actual state of the project so that future agents (and humans) have accurate context.
+>
+> **Development style — strictly incremental:** This project is being built **one step at a time**. When the user asks for something, do exactly that step and nothing more — do not pre-implement future pipeline stages, do not add features that weren't requested, and do not scaffold ahead. You may **point out** if the user seems to be heading in a wrong direction, but **do not move ahead of them**. Always stay one step in the right direction, not several.
 
 ---
 

@@ -1,0 +1,376 @@
+﻿ats_platforms:
+  greenhouse:
+    delay_seconds: 5.0
+    max_concurrency: 3
+    notes: Highly stable public JSON endpoints.
+
+  lever:
+    delay_seconds: 5.0
+    max_concurrency: 3
+    notes: Low risk of rate limits on GET postings.
+
+  ashby:
+    delay_seconds: 10.0
+    max_concurrency: 2
+    notes: Targets internal Next.js hydration payload.
+
+  smartrecruiters:
+    delay_seconds: 10.0
+    max_concurrency: 2
+    notes: Known to throw aggressive 429 errors.
+
+  teamtailor:
+    delay_seconds: 5.0
+    max_concurrency: 2
+    notes: Strictly enforces 50 requests per 10 seconds.
+
+  bamboohr:
+    delay_seconds: 15.0
+    max_concurrency: 1
+    notes: Unpredictable public limits. Keep execution linear.
+
+  icims:
+    delay_seconds: 30.0
+    max_concurrency: 1
+    notes: Enterprise portal; session management required.
+
+  workday:
+    delay_seconds: 60.0
+    max_concurrency: 1
+    notes: High risk of tenant blocks. Needs significant padding.
+
+  oracle:
+    delay_seconds: 60.0
+    max_concurrency: 1
+    notes: Enterprise structure. Avoid parallel requests.
+
+  successfactors:
+    delay_seconds: 60.0
+    max_concurrency: 1
+    notes: SAP infrastructure; slow response handling.
+
+  phenom:
+    delay_seconds: 60.0
+    max_concurrency: 1
+    notes: Heavy script/payload architectures.
+
+  avature:
+    delay_seconds: 60.0
+    max_concurrency: 1
+    notes: Legacy enterprise setups.
+
+  eightfold:
+    delay_seconds: 60.0
+    max_concurrency: 1
+    notes: Dynamic AI-driven portal; sensitive to bot heuristics.
+
+  cornerstone:
+    delay_seconds: 60.0
+    max_concurrency: 1
+    notes: Enterprise target.
+
+  personio:
+    delay_seconds: 30.0
+    max_concurrency: 1
+    notes: European mid-market focus.
+
+  recruitee:
+    delay_seconds: 20.0
+    max_concurrency: 1
+    notes: Lightweight JSON layouts.
+
+  rippling:
+    delay_seconds: 30.0
+    max_concurrency: 1
+    notes: Modern HR systems; tight session tokens.
+
+  workable:
+    delay_seconds: 20.0
+    max_concurrency: 1
+    notes: Employs moderate rate filtering.
+
+  jazzhr:
+    delay_seconds: 30.0
+    max_concurrency: 1
+    notes: Standard SME board.
+
+  breezy:
+    delay_seconds: 30.0
+    max_concurrency: 1
+    notes: Straightforward public structures.
+
+  pinpoint:
+    delay_seconds: 30.0
+    max_concurrency: 1
+    notes: Niche aggregator setup.
+
+  gem:
+    delay_seconds: 30.0
+    max_concurrency: 1
+    notes: Tracks direct applicant loops closely.
+
+  recruiterbox:
+    delay_seconds: 30.0
+    max_concurrency: 1
+    notes: Older platform infrastructure.
+
+  taleo:
+    delay_seconds: 60.0
+    max_concurrency: 1
+    notes: Oracle legacy; highly unstable headers.
+
+  join_com:
+    delay_seconds: 30.0
+    max_concurrency: 1
+    notes: Modern digital interface.
+
+companies:
+  - slug: swiggy
+    company_name: Swiggy
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: razorpay
+    company_name: Razorpay
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: groww
+    company_name: Groww
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: meesho
+    company_name: Meesho
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: cred
+    company_name: Cred
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: inmobi
+    company_name: InMobi
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: zepto
+    company_name: Zepto
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: juspay
+    company_name: Juspay
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: coinswitch
+    company_name: CoinSwitch
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: urbancompany
+    company_name: Urban Company
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: zeta
+    company_name: Zeta
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: browserstack
+    company_name: BrowserStack
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: postman
+    company_name: Postman
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: cloudera
+    company_name: Cloudera
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: rubrik
+    company_name: Rubrik
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: cohesity
+    company_name: Cohesity
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: confluent
+    company_name: Confluent
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: snowflake
+    company_name: Snowflake
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: databricks
+    company_name: Databricks
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: twilio
+    company_name: Twilio
+    ats_platform: greenhouse
+    enable: false
+
+  - slug: hotstar
+    company_name: Hotstar (Disney+)
+    ats_platform: lever
+    enable: false
+
+  - slug: atlassian
+    company_name: Atlassian
+    ats_platform: lever
+    enable: false
+
+  - slug: gojek
+    company_name: Gojek
+    ats_platform: lever
+    enable: false
+
+  - slug: grab
+    company_name: Grab
+    ats_platform: lever
+    enable: false
+
+  - slug: pocketfm
+    company_name: Pocket FM
+    ats_platform: lever
+    enable: false
+
+  - slug: blinkit
+    company_name: Blinkit
+    ats_platform: lever
+    enable: false
+
+  - slug: pharmeasy
+    company_name: Pharmeasy
+    ats_platform: lever
+    enable: false
+
+  - slug: nykaa
+    company_name: Nykaa
+    ats_platform: lever
+    enable: false
+
+  - slug: delhivery
+    company_name: Delhivery
+    ats_platform: lever
+    enable: false
+
+  - slug: upstox
+    company_name: Upstox
+    ats_platform: lever
+    enable: false
+
+  - slug: freshworks
+    company_name: Freshworks
+    ats_platform: lever
+    enable: false
+
+  - slug: chargebee
+    company_name: Chargebee
+    ats_platform: lever
+    enable: false
+
+  - slug: clevertap
+    company_name: CleverTap
+    ats_platform: lever
+    enable: false
+
+  - slug: whatfix
+    company_name: Whatfix
+    ats_platform: lever
+    enable: false
+
+  - slug: mindtickle
+    company_name: Mindtickle
+    ats_platform: lever
+    enable: false
+
+  - slug: openai
+    company_name: OpenAI
+    ats_platform: ashby
+    enable: false
+
+  - slug: notion
+    company_name: Notion
+    ats_platform: ashby
+    enable: false
+
+  - slug: vanta
+    company_name: Vanta
+    ats_platform: ashby
+    enable: false
+
+  - slug: figma
+    company_name: Figma
+    ats_platform: ashby
+    enable: false
+
+  - slug: chronosphere
+    company_name: Chronosphere
+    ats_platform: ashby
+    enable: false
+
+  - slug: autodesk
+    company_name: Autodesk
+    ats_platform: workday
+    enable: false
+
+  - slug: adobe
+    company_name: Adobe
+    ats_platform: workday
+    enable: false
+
+  - slug: cisco
+    company_name: Cisco
+    ats_platform: workday
+    enable: false
+
+  - slug: salesforce
+    company_name: Salesforce
+    ats_platform: workday
+    enable: false
+
+  - slug: intuit
+    company_name: Intuit
+    ats_platform: workday
+    enable: false
+
+  - slug: paypal
+    company_name: PayPal
+    ats_platform: workday
+    enable: false
+
+  - slug: nvidia
+    company_name: NVIDIA
+    ats_platform: workday
+    enable: false
+
+  - slug: amd
+    company_name: AMD
+    ats_platform: workday
+    enable: false
+
+  - slug: qualcomm
+    company_name: Qualcomm
+    ats_platform: workday
+    enable: false
+
+  - slug: servicenow
+    company_name: ServiceNow
+    ats_platform: workday
+    enable: false
