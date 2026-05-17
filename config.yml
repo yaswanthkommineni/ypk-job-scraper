@@ -127,7 +127,7 @@
 companies:
   - slug: swiggy
     company_name: Swiggy
-    ats_platform: greenhouse
+    ats_platform: workday
     enable: false
 
   - slug: razorpay
@@ -138,7 +138,7 @@ companies:
   - slug: groww
     company_name: Groww
     ats_platform: greenhouse
-    enable: false
+    enable: true
 
   - slug: meesho
     company_name: Meesho
@@ -148,12 +148,12 @@ companies:
   - slug: cred
     company_name: Cred
     ats_platform: greenhouse
-    enable: false
+    enable: true
 
   - slug: inmobi
     company_name: InMobi
     ats_platform: greenhouse
-    enable: false
+    enable: true
 
   - slug: zepto
     company_name: Zepto
@@ -182,13 +182,13 @@ companies:
 
   - slug: browserstack
     company_name: BrowserStack
-    ats_platform: greenhouse
-    enable: false
+    ats_platform: ashby
+    enable: true
 
   - slug: postman
     company_name: Postman
     ats_platform: greenhouse
-    enable: false
+    enable: true
 
   - slug: cloudera
     company_name: Cloudera
@@ -213,7 +213,7 @@ companies:
   - slug: snowflake
     company_name: Snowflake
     ats_platform: greenhouse
-    enable: false
+    enable: true
 
   - slug: databricks
     company_name: Databricks
@@ -228,7 +228,7 @@ companies:
   - slug: hotstar
     company_name: Hotstar (Disney+)
     ats_platform: lever
-    enable: false
+    enable: true
 
   - slug: atlassian
     company_name: Atlassian
@@ -243,7 +243,7 @@ companies:
   - slug: grab
     company_name: Grab
     ats_platform: lever
-    enable: false
+    enable: true
 
   - slug: pocketfm
     company_name: Pocket FM
@@ -273,7 +273,7 @@ companies:
   - slug: upstox
     company_name: Upstox
     ats_platform: lever
-    enable: false
+    enable: true
 
   - slug: freshworks
     company_name: Freshworks
@@ -318,7 +318,7 @@ companies:
   - slug: figma
     company_name: Figma
     ats_platform: ashby
-    enable: false
+    enable: true
 
   - slug: chronosphere
     company_name: Chronosphere
