@@ -1,0 +1,1383 @@
+# Skill alias groups derived from candidate profiles
+# (Yaswanth Kommineni, Likitha Lavanya Kommineni, Nistha Ghorela).
+#
+# Structure
+#   skills:
+#     <category>:
+#       <canonical_skill>:
+#         - alias1
+#         - alias2
+#         ...
+#
+# Matcher conventions (intended; not enforced by this file):
+#   - All aliases are matched case-insensitively.
+#   - Punctuation/hyphens/multiple-spaces should be normalized to a single
+#     space before comparison.
+#   - The canonical name is also listed inside aliases so the matcher only
+#     needs to walk the aliases list.
+#   - MATCH WITH WORD BOUNDARIES (regex \b...\b). Substring matching is
+#     forbidden — it would let "ml" match "html", "rest" match "restore",
+#     "go" match "argon", etc.
+#   - Single-letter aliases (e.g. "r", "c") and standalone English-word
+#     aliases (e.g. "go") are deliberately OMITTED because even with word
+#     boundaries they false-positive on common JD prose like "let's go
+#     build products" or "the R&D team". Use compound forms instead
+#     ("go programming", "golang", "r programming", "c language").
+#   - Two-letter abbreviations like "ml", "ai", "js", "ts" are KEPT because
+#     word-boundary matching makes them safe (e.g. \bml\b does not match
+#     "html") and they routinely appear standalone in job titles/blurbs.
+
+skills:
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Programming Languages
+  # ─────────────────────────────────────────────────────────────────────
+  languages:
+    python:
+      - python
+      - python3
+      - py
+      - cpython
+    java:
+      - java
+      - jdk
+      - jvm
+      - java 8
+      - java 11
+      - java 17
+      - java 21
+      - core java
+    scala:
+      - scala
+    kotlin:
+      - kotlin
+    rust:
+      - rust
+      - rust lang
+      - rust-lang
+    ruby:
+      - ruby
+      - ruby on rails
+      - rails
+    go:
+      # NOTE: bare "go" deliberately omitted — matches English verb.
+      - golang
+      - go programming
+      - go language
+      - go lang
+    javascript:
+      - javascript
+      - js
+      - ecmascript
+      - es6
+      - es2015
+      - vanilla js
+    typescript:
+      - typescript
+      - ts
+    cpp:
+      - c++
+      - cpp
+      - cplusplus
+      - c plus plus
+    c_language:
+      # NOTE: bare "c" deliberately omitted — single-letter false positives.
+      - c language
+      - c programming
+    sql:
+      - sql
+      - ansi sql
+      - structured query language
+    plsql:
+      - pl/sql
+      - plsql
+      - pl-sql
+      - oracle pl/sql
+    r_language:
+      # NOTE: bare "r" deliberately omitted — single-letter false positives.
+      - r language
+      - r programming
+      - r lang
+    html:
+      - html
+      - html5
+    css:
+      - css
+      - css3
+      - sass
+      - scss
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Databases / Datastores
+  # ─────────────────────────────────────────────────────────────────────
+  databases:
+    oracle_db:
+      - oracle db
+      - oracle database
+      - oracle rdbms
+      - oracle sql
+    mysql:
+      - mysql
+      - my sql
+    postgres:
+      - postgres
+      - postgresql
+      - psql
+      - postgre sql
+    mongodb:
+      - mongodb
+      - mongo
+      - mongo db
+    dynamodb:
+      - dynamodb
+      - dynamo
+      - aws dynamodb
+      - amazon dynamodb
+    redis:
+      - redis
+      - redis cluster
+      - redis sentinel
+      - redis cache
+    elasticache:
+      - elasticache
+      - amazon elasticache
+      - aws elasticache
+    sqlite:
+      - sqlite
+      - sqlite3
+    redshift:
+      - redshift
+      - amazon redshift
+      - aws redshift
+    snowflake:
+      - snowflake
+      - snowflake data warehouse
+    bigquery:
+      - bigquery
+      - google bigquery
+      - big query
+    elasticsearch:
+      - elasticsearch
+      - elastic search
+      - opensearch
+      - open search
+      - elk
+    cassandra:
+      - cassandra
+      - apache cassandra
+      - scylladb
+      - scylla db
+    cockroachdb:
+      - cockroachdb
+      - cockroach db
+    memcached:
+      - memcached
+      - memcache
+    neo4j:
+      - neo4j
+      - neo 4j
+      - graph database
+      - graph databases
+    vector_databases:
+      - vector database
+      - vector databases
+      - vector store
+      - vector stores
+      - embeddings database
+      - vector search
+    pinecone:
+      - pinecone
+    weaviate:
+      - weaviate
+    milvus:
+      - milvus
+    chromadb:
+      - chromadb
+      - chroma db
+    faiss:
+      - faiss
+      - facebook ai similarity search
+    qdrant:
+      - qdrant
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Cloud Providers
+  # ─────────────────────────────────────────────────────────────────────
+  cloud_providers:
+    aws:
+      - aws
+      - amazon web services
+    gcp:
+      - gcp
+      - google cloud
+      - google cloud platform
+    oci:
+      - oci
+      - oracle cloud
+      - oracle cloud infrastructure
+    azure:
+      - azure
+      - microsoft azure
+      - ms azure
+
+  # ─────────────────────────────────────────────────────────────────────
+  # AWS Services (explicitly used across profiles)
+  # ─────────────────────────────────────────────────────────────────────
+  aws_services:
+    ec2:
+      - ec2
+      - amazon ec2
+      - aws ec2
+    s3:
+      - s3
+      - amazon s3
+      - aws s3
+    lambda:
+      - lambda
+      - aws lambda
+      - amazon lambda
+    sqs:
+      - sqs
+      - amazon sqs
+      - aws sqs
+    sns:
+      - sns
+      - amazon sns
+    step_functions:
+      - step functions
+      - aws step functions
+    glue:
+      - aws glue
+      - amazon glue
+    sagemaker:
+      - sagemaker
+      - amazon sagemaker
+      - aws sagemaker
+    kinesis:
+      - kinesis
+      - amazon kinesis
+      - aws kinesis
+
+  # ─────────────────────────────────────────────────────────────────────
+  # DevOps / Infra / CI-CD
+  # ─────────────────────────────────────────────────────────────────────
+  devops:
+    docker:
+      - docker
+      - containerization
+      - containers
+    kubernetes:
+      - kubernetes
+      - k8s
+    git:
+      - git
+      - version control
+    github:
+      - github
+    github_actions:
+      - github actions
+    ci_cd:
+      - ci/cd
+      - cicd
+      - ci cd
+      - continuous integration
+      - continuous delivery
+      - continuous deployment
+    liquibase:
+      - liquibase
+    sonarqube:
+      - sonarqube
+      - sonar
+      - sonar qube
+    maven:
+      - maven
+      - apache maven
+    linux:
+      - linux
+      - unix
+      - bash
+      - shell scripting
+    oci_devops:
+      - oci devops
+      - oracle cloud devops
+    terraform:
+      - terraform
+      - hcl
+      - infrastructure as code
+      - infrastructure-as-code
+      - iac
+    helm:
+      - helm
+      - helm charts
+    ansible:
+      - ansible
+    pulumi:
+      - pulumi
+    cloudformation:
+      - cloudformation
+      - aws cloudformation
+    jenkins:
+      - jenkins
+      - jenkins pipeline
+      - jenkinsfile
+    vault:
+      - hashicorp vault
+      - hashi vault
+    gradle:
+      - gradle
+    bazel:
+      - bazel
+    nginx:
+      - nginx
+    tomcat:
+      - tomcat
+      - apache tomcat
+    service_mesh:
+      - service mesh
+      - istio
+      - linkerd
+    container_orchestration:
+      - container orchestration
+      - ecs
+      - amazon ecs
+      - eks
+      - amazon eks
+      - aws eks
+      - gke
+      - google kubernetes engine
+      - aks
+      - azure kubernetes service
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Observability / Monitoring
+  # ─────────────────────────────────────────────────────────────────────
+  observability:
+    observability:
+      - observability
+      - monitoring
+      - logging
+      - metrics
+    distributed_tracing:
+      - distributed tracing
+      - opentelemetry
+      - open telemetry
+      - otel
+    prometheus:
+      - prometheus
+    grafana:
+      - grafana
+    jaeger:
+      - jaeger
+    zipkin:
+      - zipkin
+    datadog:
+      - datadog
+      - data dog
+    new_relic:
+      - new relic
+      - newrelic
+    splunk:
+      - splunk
+    elk_stack:
+      - elk stack
+      - elk
+      - logstash
+      - kibana
+      - fluentd
+      - fluent bit
+      - loki
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Messaging / Streaming
+  # ─────────────────────────────────────────────────────────────────────
+  messaging:
+    kafka:
+      - kafka
+      - apache kafka
+    websockets:
+      - websockets
+      - websocket
+      - ws protocol
+    pubsub:
+      - pubsub
+      - pub/sub
+      - pub sub
+    event_driven:
+      - event driven
+      - event-driven
+      - event driven architecture
+      - eda architecture
+    rabbitmq:
+      - rabbitmq
+      - rabbit mq
+    activemq:
+      - activemq
+      - active mq
+    grpc:
+      - grpc
+      - g-rpc
+    protobuf:
+      - protobuf
+      - protocol buffers
+      - proto buffers
+    flink:
+      - flink
+      - apache flink
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Backend Frameworks / API
+  # ─────────────────────────────────────────────────────────────────────
+  backend_frameworks:
+    spring:
+      - spring
+      - spring framework
+    spring_boot:
+      - spring boot
+      - springboot
+      - spring boot framework
+      - spring boot microservices
+    helidon:
+      - helidon
+      - helidon se
+      - helidon mp
+    jakarta_rest:
+      - jakarta rest
+      - jakarta ee
+      - jax-rs
+      - jaxrs
+      - jax rs
+      - java ee
+      - jersey
+      - resteasy
+    nodejs:
+      - node
+      - nodejs
+      - node.js
+      - node js
+    expressjs:
+      - express
+      - expressjs
+      - express.js
+      - express js
+    rest_apis:
+      - rest
+      - rest api
+      - rest apis
+      - restful api
+      - restful apis
+      - restful
+      - http api
+      - http apis
+    graphql:
+      - graphql
+      - graph ql
+    api_design:
+      - api design
+      - api development
+      - api integration
+    openapi:
+      - openapi
+      - open api
+      - swagger
+      - openapi spec
+      - openapi specification
+    auth:
+      - oauth
+      - oauth2
+      - oauth 2.0
+      - oidc
+      - openid connect
+      - sso
+      - single sign on
+      - single sign-on
+      - jwt
+      - json web token
+      - json web tokens
+      - saml
+    api_gateway:
+      - api gateway
+      - kong
+      - apigee
+    spring_cloud:
+      - spring cloud
+    spring_security:
+      - spring security
+    spring_data:
+      - spring data
+      - spring data jpa
+    jpa:
+      - jpa
+      - java persistence api
+    hibernate:
+      - hibernate
+      - hibernate orm
+    nestjs:
+      - nestjs
+      - nest.js
+      - nest js
+    fastapi:
+      - fastapi
+      - fast api
+    flask:
+      - flask
+    django:
+      - django
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Frontend Frameworks / Libraries
+  # ─────────────────────────────────────────────────────────────────────
+  frontend_frameworks:
+    react:
+      - react
+      - reactjs
+      - react.js
+      - react js
+    redux:
+      - redux
+    streamlit:
+      - streamlit
+    bootstrap:
+      - bootstrap
+      - bootstrap css
+    nextjs:
+      - next.js
+      - nextjs
+      - next js
+    tailwind:
+      - tailwind
+      - tailwindcss
+      - tailwind css
+    material_ui:
+      - material ui
+      - material-ui
+      - mui
+    vite:
+      - vite
+    webpack:
+      - webpack
+    angular:
+      - angular
+      - angular.js
+      - angularjs
+    vue:
+      - vue
+      - vuejs
+      - vue.js
+
+  # ─────────────────────────────────────────────────────────────────────
+  # ML / AI Frameworks
+  # ─────────────────────────────────────────────────────────────────────
+  ml_frameworks:
+    tensorflow:
+      # NOTE: bare "tf" omitted — collides with terraform shorthand and "tf-idf".
+      - tensorflow
+      - tensor flow
+    pytorch:
+      - pytorch
+      - torch
+      - py torch
+    scikit_learn:
+      - scikit-learn
+      - sklearn
+      - scikit learn
+    keras:
+      - keras
+    opencv:
+      - opencv
+      - cv2
+      - open cv
+    mlflow:
+      - mlflow
+      - ml flow
+    langchain:
+      - langchain
+      - lang chain
+    llamaindex:
+      - llamaindex
+      - llama index
+      - llama-index
+    transformers:
+      - transformers
+      - transformer models
+      - hugging face
+      - huggingface
+      - hugging face transformers
+    openai_api:
+      - openai api
+      - chatgpt api
+      - gpt api
+      - openai sdk
+    anthropic_api:
+      - anthropic api
+      - claude api
+    jupyter:
+      - jupyter
+      - jupyter notebook
+      - jupyter notebooks
+      - jupyterlab
+    ray:
+      - ray
+      - ray serve
+      - anyscale ray
+    jax:
+      - jax
+      - google jax
+    onnx:
+      - onnx
+      - onnxruntime
+      - onnx runtime
+    triton:
+      - triton inference server
+      - nvidia triton
+    bentoml:
+      - bentoml
+      - bento ml
+
+  # ─────────────────────────────────────────────────────────────────────
+  # ML / AI Concepts & Algorithms
+  # ─────────────────────────────────────────────────────────────────────
+  ml_concepts:
+    machine_learning:
+      - machine learning
+      - ml
+    deep_learning:
+      # NOTE: bare "dl" omitted — collides with "download", "Driver's License".
+      - deep learning
+      - neural networks
+      - neural network
+    nlp:
+      - nlp
+      - natural language processing
+    cnn:
+      - cnn
+      - cnns
+      - convolutional neural network
+      - convolutional neural networks
+    rnn:
+      - rnn
+      - rnns
+      - recurrent neural network
+      - recurrent neural networks
+    lstm:
+      - lstm
+      - long short term memory
+      - long short-term memory
+    mlp:
+      - mlp
+      - mlps
+      - multi-layer perceptron
+      - multi layer perceptron
+      - multilayer perceptron
+    svm:
+      - svm
+      - support vector machine
+      - support vector machines
+    random_forest:
+      - random forest
+      - random forests
+    llm:
+      - llm
+      - llms
+      - large language model
+      - large language models
+    generative_ai:
+      - genai
+      - gen ai
+      - generative ai
+      - generative artificial intelligence
+    ai_agents:
+      - ai agent
+      - ai agents
+      - agentic ai
+      - agentic workflows
+      - agent framework
+    rag:
+      - rag
+      - retrieval augmented generation
+      - retrieval-augmented generation
+    embeddings:
+      - embeddings
+      - text embeddings
+      - sentence embeddings
+      - word embeddings
+      - vector embeddings
+    prompt_engineering:
+      - prompt engineering
+      - prompt design
+      - prompt tuning
+    fine_tuning:
+      - fine tuning
+      - fine-tuning
+      - lora
+      - qlora
+      - peft
+      - parameter efficient fine tuning
+    model_evaluation:
+      - model evaluation
+      - eval framework
+      - evals
+    knowledge_graph:
+      # NOTE: bare "kg" omitted — kilogram collision.
+      - knowledge graph
+      - knowledge graphs
+    clustering:
+      - clustering
+      - k-means
+      - kmeans
+      - k means
+      - k-medoids
+      - k medoids
+      - hierarchical clustering
+      - kernel diffusion
+    recommendation_systems:
+      - recommendation system
+      - recommendation systems
+      - recommender system
+      - recommender systems
+    audio_features:
+      - mfcc
+      - mel-frequency cepstral coefficients
+      - mel frequency cepstral coefficients
+    speech_recognition:
+      - speech recognition
+      - speech emotion recognition
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Data / Big-Data Ecosystem
+  # ─────────────────────────────────────────────────────────────────────
+  big_data:
+    spark:
+      - spark
+      - apache spark
+      - pyspark
+      - spark mllib
+      - mllib
+    hadoop:
+      - hadoop
+      - apache hadoop
+    hdfs:
+      - hdfs
+      - hadoop distributed file system
+    mapreduce:
+      - mapreduce
+      - map reduce
+      - map-reduce
+    hive:
+      - hive
+      - apache hive
+    airflow:
+      - airflow
+      - apache airflow
+    beam:
+      - apache beam
+      - beam
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Data Science Libraries
+  # ─────────────────────────────────────────────────────────────────────
+  data_libraries:
+    numpy:
+      # NOTE: bare "np" omitted — initials false-positives.
+      - numpy
+    pandas:
+      # NOTE: bare "pd" omitted — initials false-positives.
+      - pandas
+    scipy:
+      - scipy
+      - sci py
+    librosa:
+      - librosa
+    pydub:
+      - pydub
+    dask:
+      - dask
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Visualization / BI
+  # ─────────────────────────────────────────────────────────────────────
+  visualization:
+    seaborn:
+      - seaborn
+    matplotlib:
+      - matplotlib
+    tableau:
+      - tableau
+    power_bi:
+      - power bi
+      - powerbi
+      - microsoft power bi
+    oracle_analytics_cloud:
+      - oracle analytics cloud
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Testing
+  # ─────────────────────────────────────────────────────────────────────
+  testing:
+    jest:
+      - jest
+    unit_testing:
+      - unit testing
+      - unit tests
+      - unit test
+    tdd:
+      - tdd
+      - test driven development
+      - test-driven development
+    integration_testing:
+      - integration testing
+      - integration tests
+    postman:
+      - postman
+    zhypher:
+      - zhypher
+    testlib:
+      - testlib
+      - testlib.h
+      - polygon platform
+    zephyr:
+      - zephyr
+      - zephyr scale
+      - zephyr squad
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Engineering Concepts / System Design
+  # ─────────────────────────────────────────────────────────────────────
+  concepts:
+    distributed_systems:
+      - distributed systems
+      - distributed system
+      - distributed computing
+    microservices:
+      - microservice
+      - microservices
+      - micro-services
+      - micro services
+    system_design:
+      - system design
+      - hld
+      - lld
+      - high level design
+      - low level design
+    concurrency:
+      - concurrency
+      - multithreading
+      - multi-threading
+      - multi threading
+      - threading
+      - concurrent programming
+    parallel_processing:
+      - parallel processing
+      - parallelism
+      - parallel computing
+    asynchronous_programming:
+      - asynchronous
+      - async
+      - async programming
+      - non-blocking
+      - non blocking
+      - fire and forget
+      - fire-and-forget
+    actor_model:
+      - actor model
+      - actor framework
+      - akka
+    optimistic_concurrency_control:
+      - optimistic concurrency control
+      - occ
+      - optimistic locking
+    data_structures:
+      - data structures
+      - dsa
+      - data structures and algorithms
+    algorithms:
+      - algorithms
+      - algorithm design
+      - algorithmic
+    oop:
+      - oop
+      - object oriented programming
+      - object-oriented programming
+    operating_systems:
+      - operating systems
+      - os concepts
+    cloud_computing:
+      - cloud computing
+      - cloud native
+      - cloud-native
+    information_retrieval:
+      # NOTE: bare "ir" omitted — too many collisions (Iranian rial, infrared, etc.).
+      - information retrieval
+    social_network_analytics:
+      - social network analytics
+      - social network analysis
+    biometrics:
+      - biometrics
+    fault_tolerance:
+      - fault tolerance
+      - fault tolerant
+      - fault-tolerant
+      - high availability
+    scalability:
+      - scalability
+      - scalable
+      - horizontally scaled
+      - horizontal scaling
+      - vertical scaling
+
+  # ─────────────────────────────────────────────────────────────────────
+  # MLOps / Data Engineering Concepts
+  # ─────────────────────────────────────────────────────────────────────
+  mlops:
+    mlops:
+      - mlops
+      - ml ops
+    feature_engineering:
+      - feature engineering
+    data_preprocessing:
+      - data preprocessing
+      - data cleaning
+      - data wrangling
+    eda:
+      - eda
+      - exploratory data analysis
+    etl:
+      - etl
+      - elt
+      - extract transform load
+    predictive_analytics:
+      - predictive analytics
+      - predictive modeling
+      - time series forecasting
+      - forecasting
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Oracle-specific Tooling
+  # ─────────────────────────────────────────────────────────────────────
+  oracle_tools:
+    oracle_jet:
+      - oracle jet
+      - oraclejet
+      - oracle javascript extension toolkit
+    oracle_sql_developer:
+      - oracle sql developer
+      - sql developer
+    oracle_data_modeler:
+      - oracle data modeler
+      - sql data modeler
+    oci_data_science:
+      - oci data science
+      - oracle data science
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Tech Stacks
+  # ─────────────────────────────────────────────────────────────────────
+  stacks:
+    mern:
+      - mern
+      - mern stack
+    mean:
+      # NOTE: bare "mean" omitted — collides with statistical/English usage.
+      - mean stack
+    lamp:
+      # NOTE: bare "lamp" omitted — common English word.
+      - lamp stack
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Misc Tools / Platforms
+  # ─────────────────────────────────────────────────────────────────────
+  other_tools:
+    firebase:
+      - firebase
+      - google firebase
+    figma:
+      - figma
+    yahoo_finance:
+      - yahoo finance
+      - yahoo finance api
+    telegram_api:
+      - telegram
+      - telegram bot
+      - telegram api
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Competitive Programming (career signal, not a JD skill but useful tag)
+  # ─────────────────────────────────────────────────────────────────────
+  competitive_programming:
+    codeforces:
+      # NOTE: bare "cf" omitted — collides with Cloudflare and "cf." citations.
+      - codeforces
+    codechef:
+      - codechef
+      - code chef
+    icpc:
+      - icpc
+      - acm icpc
+      - international collegiate programming contest
+    competitive_programming:
+      - competitive programming
+      - competitive coding
+
+# ─────────────────────────────────────────────────────────────────────────
+# Job Roles / Titles
+# ─────────────────────────────────────────────────────────────────────────
+# These are intended to be matched primarily against the job *title*
+# (not the full description body). Structure mirrors `skills:` above.
+#
+# Seniority modifiers (`seniority_modifiers`) and domain qualifiers
+# (`domain_qualifiers`) are *prefixes/suffixes* that combine with role
+# keywords; e.g. "Senior Backend Engineer" should match both
+# `seniority_modifiers.senior` and `role_families.backend_engineer`.
+
+roles:
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Generic software engineering titles
+  # ─────────────────────────────────────────────────────────────────────
+  generic_swe:
+    software_engineer:
+      - software engineer
+      - software developer
+      - software development engineer
+      - swe
+      - sde
+      - sde i
+      - sde ii
+      - sde iii
+      - sde-1
+      - sde-2
+      - sde-3
+      - sde 1
+      - sde 2
+      - sde 3
+      - sdet ii
+      - software dev
+      - dev engineer
+    application_developer:
+      - application developer
+      - applications developer
+      - app developer
+      - associate application developer
+      - applications engineer
+      - application engineer
+    member_of_technical_staff:
+      - member of technical staff
+      - mts
+      - smts
+      - pmts
+      - software mts
+      - senior member of technical staff
+    technical_lead:
+      - technical lead
+      - tech lead
+      - team lead
+      - engineering lead
+      - lead engineer
+      - lead software engineer
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Role families (specializations within software engineering)
+  # ─────────────────────────────────────────────────────────────────────
+  role_families:
+    backend_engineer:
+      - backend engineer
+      - back-end engineer
+      - back end engineer
+      - backend developer
+      - back-end developer
+      - server engineer
+      - server-side engineer
+      - server side engineer
+      - api engineer
+      - api developer
+      - services engineer
+    frontend_engineer:
+      - frontend engineer
+      - front-end engineer
+      - front end engineer
+      - frontend developer
+      - front-end developer
+      - ui engineer
+      - ui developer
+      - web engineer
+      - web developer
+      - client-side engineer
+      - client side engineer
+    fullstack_engineer:
+      - fullstack engineer
+      - full-stack engineer
+      - full stack engineer
+      - fullstack developer
+      - full-stack developer
+      - full stack developer
+      - full stack
+      - fullstack
+    platform_engineer:
+      - platform engineer
+      - platform developer
+      - platform software engineer
+      - internal platform engineer
+      - developer platform engineer
+      - core platform engineer
+      - platform infrastructure engineer
+      - dev platform engineer
+    infrastructure_engineer:
+      - infrastructure engineer
+      - infra engineer
+      - infrastructure developer
+      - infrastructure software engineer
+    devops_engineer:
+      - devops engineer
+      - devops
+      - dev ops
+      - build engineer
+      - release engineer
+      - ci/cd engineer
+    sre:
+      - site reliability engineer
+      - sre
+      - reliability engineer
+      - production engineer
+    cloud_engineer:
+      - cloud engineer
+      - cloud developer
+      - cloud software engineer
+      - cloud infrastructure engineer
+      - cloud platform engineer
+      - cloud native engineer
+    distributed_systems_engineer:
+      - distributed systems engineer
+      - distributed systems software engineer
+      - systems engineer
+      - systems software engineer
+    backend_systems_engineer:
+      - backend systems engineer
+      - systems backend engineer
+      - storage engineer
+      - database engineer
+      - dbre
+      - database reliability engineer
+    performance_engineer:
+      - performance engineer
+      - performance software engineer
+    security_engineer:
+      - security engineer
+      - application security engineer
+      - appsec engineer
+      - product security engineer
+    test_engineer:
+      - test engineer
+      - sdet
+      - software development engineer in test
+      - qa engineer
+      - quality engineer
+      - automation engineer
+    mobile_engineer:
+      - mobile engineer
+      - mobile developer
+      - android engineer
+      - android developer
+      - ios engineer
+      - ios developer
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Data / ML / AI roles
+  # ─────────────────────────────────────────────────────────────────────
+  data_ml_roles:
+    data_engineer:
+      - data engineer
+      - big data engineer
+      - data platform engineer
+      - data infrastructure engineer
+      - analytics engineer
+      - etl developer
+      - data pipeline engineer
+    data_scientist:
+      - data scientist
+      - applied data scientist
+      - product data scientist
+      - decision scientist
+    machine_learning_engineer:
+      - machine learning engineer
+      - ml engineer
+      - mle
+      - applied ml engineer
+      - applied machine learning engineer
+      - ml software engineer
+      - ml platform engineer
+      - machine learning software engineer
+    mlops_engineer:
+      - mlops engineer
+      - ml ops engineer
+      - ml infrastructure engineer
+      - ml platform engineer
+      - ml infra engineer
+    ai_engineer:
+      - ai engineer
+      - artificial intelligence engineer
+      - applied ai engineer
+      - ai software engineer
+    applied_scientist:
+      - applied scientist
+      - applied research scientist
+      - applied ml scientist
+      - research engineer
+      - research scientist
+    genai_engineer:
+      - genai engineer
+      - gen ai engineer
+      - generative ai engineer
+      - llm engineer
+      - large language model engineer
+      - foundation model engineer
+      - llm platform engineer
+      - llmops engineer
+    computer_vision_engineer:
+      - computer vision engineer
+      - cv engineer
+      - vision engineer
+      - perception engineer
+    nlp_engineer:
+      - nlp engineer
+      - natural language processing engineer
+      - speech engineer
+    recsys_engineer:
+      - recommendation systems engineer
+      - recommendation engineer
+      - recsys engineer
+      - ranking engineer
+      - personalization engineer
+    search_engineer:
+      - search engineer
+      - search infrastructure engineer
+      - information retrieval engineer
+      - ir engineer
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Architect / leadership IC tracks
+  # ─────────────────────────────────────────────────────────────────────
+  architect_roles:
+    software_architect:
+      - software architect
+      - solution architect
+      - solutions architect
+      - cloud solutions architect
+      - cloud architect
+      - enterprise architect
+    principal_engineer:
+      - principal engineer
+      - principal software engineer
+      - principal swe
+      - distinguished engineer
+      - fellow engineer
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Seniority modifiers (combine with role keywords)
+  # ─────────────────────────────────────────────────────────────────────
+  seniority_modifiers:
+    intern:
+      - intern
+      - internship
+      - trainee
+      - apprentice
+      - co-op
+      - coop
+    new_grad:
+      - new grad
+      - new graduate
+      - graduate engineer
+      - graduate software engineer
+      - entry level
+      - entry-level
+      - early career
+      - early-career
+      - early in career
+    junior:
+      - junior
+      - jr
+      - jr.
+      - associate
+    mid_level:
+      - mid level
+      - mid-level
+      - intermediate
+      - ii
+      - level ii
+      - l3
+      - l4
+    senior:
+      - senior
+      - sr
+      - sr.
+      - iii
+      - level iii
+      - l5
+    staff:
+      - staff
+      - staff engineer
+      - staff software engineer
+      - iv
+      - l6
+    principal:
+      - principal
+      - principal engineer
+      - l7
+    lead:
+      - lead
+      - lead engineer
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Domain qualifiers (prefixes/suffixes commonly applied to engineer roles)
+  # ─────────────────────────────────────────────────────────────────────
+  domain_qualifiers:
+    distributed_systems:
+      - distributed systems
+      - distributed computing
+    cloud:
+      - cloud
+      - cloud native
+      - cloud-native
+    platform:
+      - platform
+      - developer platform
+      - internal platform
+    backend:
+      - backend
+      - back-end
+      - back end
+      - server-side
+      - server side
+    frontend:
+      - frontend
+      - front-end
+      - front end
+      - client-side
+      - client side
+    fullstack:
+      - fullstack
+      - full-stack
+      - full stack
+    api:
+      - api
+      - apis
+      - rest
+      - restful
+      - microservices
+    data:
+      - data
+      - big data
+      - analytics
+    ml:
+      - ml
+      - machine learning
+      - ai
+      - artificial intelligence
+      - genai
+      - generative ai
+      - llm
+    fintech:
+      - fintech
+      - financial services
+      - banking
+      - payments
+      - capital markets
+      - trading systems

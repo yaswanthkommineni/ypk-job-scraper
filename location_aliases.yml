@@ -1,0 +1,240 @@
+# Location alias groups.
+# Same shape as skill_aliases.yml so the matcher can reuse one walker:
+#
+#   locations:
+#     <region>:
+#       <canonical_location>:
+#         - alias1
+#         - alias2
+#
+# Conventions (intended; not enforced here):
+#   - Aliases are matched case-insensitively against the JD's `location` field
+#     (and, secondarily, against the JD body for hints like "based in Bengaluru").
+#   - Punctuation/hyphens/multiple-spaces normalized to a single space.
+#   - Word-boundary matching (\b...\b) is mandatory to avoid e.g. "sf" inside
+#     "transfer". Bare 1-2 letter airport-style codes (sfo, lax, blr) are
+#     KEPT — they're safe with word boundaries and routinely appear in JDs.
+#   - In profiles.yaml, reference a location as `locations.<region>.<canonical>`
+#     (dotted) to avoid collisions across regions.
+#
+# Scope: India + US California (per user direction). Plus generic "remote/
+# hybrid/onsite" work-mode aliases that JDs commonly use.
+
+locations:
+
+  # ─────────────────────────────────────────────────────────────────────
+  # India — major tech hubs
+  # ─────────────────────────────────────────────────────────────────────
+  india:
+    bengaluru:
+      - bengaluru
+      - bangalore
+      - blr
+      - bglr
+      - bengaluru karnataka
+      - bangalore karnataka
+      - bangalore india
+      - bengaluru india
+    hyderabad:
+      - hyderabad
+      - hyd
+      - secunderabad
+      - cyberabad
+      - hyderabad telangana
+      - hyderabad india
+    pune:
+      - pune
+      - pune maharashtra
+      - pune india
+    mumbai:
+      - mumbai
+      - bombay
+      - mumbai maharashtra
+      - navi mumbai
+      - thane
+    delhi_ncr:
+      - delhi
+      - new delhi
+      - ncr
+      - delhi ncr
+      - delhi-ncr
+      - national capital region
+    gurgaon:
+      - gurgaon
+      - gurugram
+      - gurgaon haryana
+      - gurugram haryana
+    noida:
+      - noida
+      - greater noida
+      - noida uttar pradesh
+    chennai:
+      - chennai
+      - madras
+      - chennai tamil nadu
+    kolkata:
+      - kolkata
+      - calcutta
+      - kolkata west bengal
+    ahmedabad:
+      - ahmedabad
+      - ahmedabad gujarat
+    kochi:
+      - kochi
+      - cochin
+      - kochi kerala
+    thiruvananthapuram:
+      - thiruvananthapuram
+      - trivandrum
+    coimbatore:
+      - coimbatore
+    indore:
+      - indore
+    jaipur:
+      - jaipur
+    chandigarh:
+      - chandigarh
+      - mohali
+      - panchkula
+    india_country:
+      - india
+      - in (country)
+      - bharat
+
+  # ─────────────────────────────────────────────────────────────────────
+  # United States — California (per user direction)
+  # ─────────────────────────────────────────────────────────────────────
+  us_california:
+    san_francisco_bay_area:
+      - san francisco
+      - sf
+      - sfo
+      - san francisco ca
+      - san francisco california
+      - bay area
+      - sf bay area
+      - san francisco bay area
+    silicon_valley:
+      - silicon valley
+      - palo alto
+      - mountain view
+      - sunnyvale
+      - cupertino
+      - menlo park
+      - redwood city
+      - santa clara
+      - los altos
+      - milpitas
+    san_jose:
+      - san jose
+      - san jose ca
+      - south bay
+    oakland:
+      - oakland
+      - east bay
+      - berkeley
+      - emeryville
+      - alameda
+    los_angeles:
+      - los angeles
+      - la
+      - l.a.
+      - greater los angeles
+      - pasadena
+      - santa monica
+      - culver city
+      - burbank
+      - long beach
+    san_diego:
+      - san diego
+      - san diego ca
+    sacramento:
+      - sacramento
+    irvine:
+      - irvine
+      - orange county
+      - newport beach
+      - costa mesa
+    california_state:
+      - california
+      - ca (state)
+      - calif
+
+  # ─────────────────────────────────────────────────────────────────────
+  # United States — other tech hubs (lighter coverage; expand later if needed)
+  # ─────────────────────────────────────────────────────────────────────
+  us_other:
+    seattle:
+      - seattle
+      - seattle wa
+      - bellevue
+      - redmond
+      - kirkland
+      - puget sound
+    new_york:
+      - new york
+      - new york city
+      - nyc
+      - manhattan
+      - brooklyn
+    austin:
+      - austin
+      - austin tx
+      - austin texas
+    boston:
+      - boston
+      - cambridge ma
+      - greater boston
+    chicago:
+      - chicago
+      - chicago il
+    denver:
+      - denver
+      - boulder
+    atlanta:
+      - atlanta
+      - atlanta ga
+    united_states:
+      - united states
+      - usa
+      - u.s.a.
+      - u.s.
+      - us (country)
+      - america
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Work modes (orthogonal to geography; combine with city/region)
+  # ─────────────────────────────────────────────────────────────────────
+  work_modes:
+    remote:
+      - remote
+      - fully remote
+      - 100% remote
+      - work from anywhere
+      - distributed team
+      - wfh
+      - work from home
+    hybrid:
+      - hybrid
+      - hybrid remote
+      - flexible
+    onsite:
+      - onsite
+      - on site
+      - on-site
+      - in office
+      - in-office
+      - in person
+      - in-person
+    relocation:
+      - relocation
+      - relocation assistance
+      - relocation provided
+      - relocation support
+      - will relocate
+    visa_sponsorship:
+      - visa sponsorship
+      - sponsorship available
+      - h1b sponsorship
+      - h-1b sponsorship
+      - work permit sponsorship

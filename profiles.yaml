@@ -1,0 +1,149 @@
+# Candidate Profiles. Full schema, DSL grammar, and conventions live in
+# context.md — this header is a cheat-sheet only.
+#
+# IMPORTANT: after editing this file, run `python validate_profiles.py`.
+#
+# Fields per profile:
+#   profile_name         unique string id
+#   enable               bool; false → skipped. ALWAYS default to false for new
+#                        profiles; flip to true only once the profile is tuned
+#                        and you actually want it producing matches.
+#   years_of_experience  true-decimal years (2y 8m = 2 + 8/12 = 2.67, NOT 2.8)
+#   locations            list of dotted refs into location_aliases.yml
+#                        (e.g. locations.india.bengaluru, locations.work_modes.remote)
+#   matching_rules       list of rules; ALL must pass (AND across rules)
+#
+# Each rule has: type ("boolean" | "scored"), optional description, expression.
+# Group references inside expressions are dotted paths into the alias files:
+#   skills.<category>.<canonical>      → skill_aliases.yml
+#   roles.<category>.<canonical>       → skill_aliases.yml
+#   locations.<region>.<canonical>     → location_aliases.yml
+#
+# Quick examples:
+#
+#   # boolean — at least one cloud, and not an intern role
+#   - type: boolean
+#     expression: >
+#       (skills.cloud_providers.aws or skills.cloud_providers.gcp)
+#       and not roles.seniority_modifiers.intern
+#
+#   # scored — weighted skills with a threshold
+#   - type: scored
+#     expression: >
+#       skills.languages.go=3,
+#       skills.messaging.kafka=2,
+#       skills.cloud_providers.aws=2,
+#       totalscore>=4
+
+profiles:
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Profile: Yaswanth — backend / distributed systems
+  # ─────────────────────────────────────────────────────────────────────
+  - profile_name: yaswanth_backend_distsys
+    enable: false   # default false; flip to true when ready to use
+    years_of_experience: 2.75   # 2 years 9 months (Aug 2023 → ~May 2026)
+    locations:
+      - locations.india.bengaluru
+      - locations.india.hyderabad
+      - locations.us_california.san_francisco_bay_area
+      - locations.us_california.silicon_valley
+      - locations.work_modes.remote
+      - locations.work_modes.hybrid
+    matching_rules:
+
+      - type: boolean
+        description: >
+          Role must be a backend / fullstack / platform / distributed systems
+          IC role (or a generic SWE / app-dev title). Excludes pure frontend,
+          mobile, ML, data, security, and test-engineering roles.
+        expression: >
+          roles.role_families.backend_engineer
+          or roles.role_families.fullstack_engineer
+          or roles.role_families.platform_engineer
+          or roles.role_families.distributed_systems_engineer
+          or roles.role_families.cloud_engineer
+          or roles.role_families.infrastructure_engineer
+          or roles.generic_swe.software_engineer
+          or roles.generic_swe.application_developer
+          or roles.generic_swe.member_of_technical_staff
+
+      - type: boolean
+        description: Excludes interns and pure new-grad-only postings.
+        expression: >
+          not roles.seniority_modifiers.intern
+          and not roles.seniority_modifiers.new_grad
+
+      - type: boolean
+        description: Must use at least one of the languages this profile knows.
+        expression: >
+          skills.languages.go
+          or skills.languages.scala
+          or skills.languages.java
+          or skills.languages.python
+          or skills.languages.javascript
+          or skills.languages.typescript
+
+      - type: boolean
+        description: Must touch some cloud (this is a cloud-native distsys profile).
+        expression: >
+          skills.cloud_providers.aws
+          or skills.cloud_providers.gcp
+          or skills.cloud_providers.oci
+          or skills.cloud_providers.azure
+
+      - type: scored
+        description: >
+          Quality signal — accumulate points for distributed-systems / backend
+          stack keywords. Must clear a moderate threshold to count as a strong
+          match. Tune weights/threshold as we learn from real postings.
+        expression: >
+          skills.concepts.distributed_systems=3,
+          skills.concepts.microservices=2,
+          skills.concepts.scalability=2,
+          skills.concepts.fault_tolerance=2,
+          skills.concepts.concurrency=2,
+          skills.concepts.parallel_processing=1,
+          skills.messaging.kafka=2,
+          skills.messaging.grpc=2,
+          skills.messaging.rabbitmq=1,
+          skills.databases.redis=2,
+          skills.databases.dynamodb=2,
+          skills.databases.cassandra=1,
+          skills.aws_services.lambda=1,
+          skills.aws_services.sqs=1,
+          skills.aws_services.s3=1,
+          skills.observability.distributed_tracing=1,
+          totalscore>=5
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Profile: Yaswanth — fullstack (looser filter, broader net)
+  # ─────────────────────────────────────────────────────────────────────
+  - profile_name: yaswanth_fullstack_broad
+    enable: false   # default false; flip to true when ready to use
+    years_of_experience: 2.75
+    locations:
+      - locations.india.bengaluru
+      - locations.work_modes.remote
+      - locations.work_modes.hybrid
+    matching_rules:
+      - type: boolean
+        description: Any SWE-ish role except clearly-unrelated specializations.
+        expression: >
+          (roles.generic_swe.software_engineer
+            or roles.role_families.backend_engineer
+            or roles.role_families.fullstack_engineer
+            or roles.role_families.platform_engineer)
+          and not roles.role_families.mobile_engineer
+          and not roles.role_families.security_engineer
+          and not roles.data_ml_roles.data_scientist
+      - type: boolean
+        description: Must overlap on at least one core skill from this profile.
+        expression: >
+          skills.languages.java
+          or skills.languages.go
+          or skills.languages.scala
+          or skills.languages.python
+          or skills.backend_frameworks.spring_boot
+          or skills.backend_frameworks.helidon
+          or skills.frontend_frameworks.react
