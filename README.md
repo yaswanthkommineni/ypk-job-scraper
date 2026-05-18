@@ -53,10 +53,10 @@ Press `Ctrl+C` to stop cleanly.
 `try_fetch.py` is a standalone CLI tester for verifying a single `(ats, slug)` pair without spinning up the full pipeline (no DB writes, no loop, no rate limiting). Use it when you suspect a wrong slug, want to inspect what jobhive returns, or want to sanity-check a connector.
 
 ```bash
-# Fetch one and print parsed fields
+# Fetch one and print parsed fields (prints all jobs by default)
 python try_fetch.py greenhouse swiggy
 
-# Limit the number of jobs printed
+# Optionally cap how many jobs are printed
 python try_fetch.py lever atlassian --limit 5
 
 # Also dump each job's full model_dump JSON (useful for finding field names)

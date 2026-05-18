@@ -5,7 +5,7 @@ inspect what jobhive actually returns, or sanity-check rate-limit/error paths
 without bringing up the full pipeline.
 
 Usage:
-    python try_fetch.py <ats> <slug>                # fetch one
+    python try_fetch.py <ats> <slug>                # fetch one (prints all jobs)
     python try_fetch.py <ats> <slug> --limit 5      # only print first 5 jobs
     python try_fetch.py <ats> <slug> --raw          # also dump model_dump JSON
     python try_fetch.py --examples                  # try a handful of known slugs
@@ -54,7 +54,7 @@ def print_job(idx: int, job, dump_raw: bool) -> None:
         print("      raw:", json.dumps(data, indent=2, default=str))
 
 
-def try_one(ats: str, slug: str, limit: int, dump_raw: bool) -> int:
+def try_one(ats: str, slug: str, dump_raw: bool, limit: int | None) -> int:
     print(f"\n=== {ats}:{slug} ===", flush=True)
     try:
         result = fetch_live_jobs(ats, slug)
@@ -69,8 +69,14 @@ def try_one(ats: str, slug: str, limit: int, dump_raw: bool) -> int:
         print(f"  error:  {result['error']}")
 
     jobs = result.get("jobs") or []
-    print(f"  jobs:   {len(jobs)}")
-    for idx, job in enumerate(jobs[:limit], 1):
+    total = len(jobs)
+    if limit is not None and limit >= 0:
+        shown = jobs[:limit]
+        print(f"  jobs:   {total} (showing {len(shown)})")
+    else:
+        shown = jobs
+        print(f"  jobs:   {total}")
+    for idx, job in enumerate(shown, 1):
         print_job(idx, job, dump_raw)
 
     return 0 if result["status"] == "success" else 1
@@ -83,7 +89,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("ats", nargs="?", help="ATS platform (e.g. greenhouse, lever, ashby)")
     parser.add_argument("slug", nargs="?", help="Company slug on that ATS")
     parser.add_argument(
-        "--limit", type=int, default=10, help="Max jobs to print (default: 10)"
+        "--limit",
+        type=int,
+        default=None,
+        help="Optional: max number of jobs to print (default: print all)",
     )
     parser.add_argument(
         "--raw",
@@ -104,7 +113,7 @@ def main() -> int:
     if args.examples:
         any_failed = False
         for ats, slug in EXAMPLES:
-            rc = try_one(ats, slug, args.limit, args.raw)
+            rc = try_one(ats, slug, args.raw, args.limit)
             any_failed = any_failed or (rc != 0)
         return 1 if any_failed else 0
 
@@ -112,7 +121,7 @@ def main() -> int:
         print("error: provide both <ats> and <slug>, or use --examples", file=sys.stderr)
         return 2
 
-    return try_one(args.ats, args.slug, args.limit, args.raw)
+    return try_one(args.ats, args.slug, args.raw, args.limit)
 
 
 if __name__ == "__main__":

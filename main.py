@@ -22,7 +22,8 @@ TICK_INTERVAL_SECONDS = 5
 CONFIG_PATH = Path(__file__).parent / "config.yml"
 DB_PATH = Path(__file__).parent / "pipeline_state.db"
 INITIAL_COOLDOWN_SECONDS = 60 * 60  # 1 hour
-JOB_ID_RETENTION_SECONDS = 24 * 60 * 60  # 24 hours
+#TODO: Change this to 24 hours once everything is set
+JOB_ID_RETENTION_SECONDS = 30 * 24 * 60 * 60  # 24 hours
 CLEANUP_INTERVAL_SECONDS = 60 * 60  # 1 hour
 MAX_JOB_AGE_SECONDS = 30 * 24 * 60 * 60  # drop jobs posted more than 24h ago
 
@@ -352,16 +353,16 @@ def process_fetch_result(
         already_seen = record_job_id(conn, slug, job_id)
         if already_seen:
             repeat_count += 1
-        else:
-            new_count += 1
+            # Repeats stay silent; they're still counted in the summary line.
+            continue
+        new_count += 1
 
         title = getattr(job, "title", None)
         location = getattr(job, "location", None)
         url = getattr(job, "url", None) or getattr(job, "apply_url", None)
         posted_at = _extract_posted_at(job)
-        marker = "REPEAT" if already_seen else "NEW   "
         print(
-            f"    [{marker}] {title} | {location} | posted={posted_at} | {url}",
+            f"    [NEW] {title} | {location} | posted={posted_at} | {url}",
             flush=True,
         )
 
