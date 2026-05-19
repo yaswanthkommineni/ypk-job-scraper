@@ -7,27 +7,90 @@ See context.md for the overall architecture and development style.
 
 from __future__ import annotations
 
+import html
 import signal
 import sqlite3
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from pathlib import Path
 
 import yaml
 from jobhive.scrapers import get_scraper
 
+from verification.match_profile import (
+    MatchResult,
+    MatcherError,
+    load_alias_files,
+    load_all_profiles,
+    match_profile_against_jd,
+)
+from verification.sync_telegram_chat_ids import (
+    SyncError,
+    send_message,
+    sync_chat_ids,
+)
+from verification.validate_profiles import ValidationError, validate_profiles
+
 TICK_INTERVAL_SECONDS = 5
 CONFIG_PATH = Path(__file__).parent / "config.yml"
+PROFILES_PATH = Path(__file__).parent / "profiles.yaml"
 DB_PATH = Path(__file__).parent / "pipeline_state.db"
 INITIAL_COOLDOWN_SECONDS = 60 * 60  # 1 hour
-JOB_ID_RETENTION_SECONDS = 24 * 60 * 60  # 24 hours
+#TODO: Change this to 24 hours once everything is set
+JOB_ID_RETENTION_SECONDS = 30 * 24 * 60 * 60  # 24 hours
 CLEANUP_INTERVAL_SECONDS = 60 * 60  # 1 hour
 MAX_JOB_AGE_SECONDS = 30 * 24 * 60 * 60  # drop jobs posted more than 24h ago
+# How often to poll Telegram for new `profile=<name>` binding messages.
+# Telegram's getUpdates returns the last ~24h of messages, so the pipeline
+# doesn't miss anything between polls — this just controls latency
+# between a candidate DMing the bot and their chat_id landing in
+# profiles.yaml. The sync ALSO runs once at startup (see
+# `last_telegram_sync_at = 0.0` in `main()`), so a fresh process picks up
+# any binding the owner sent before launching.
+TELEGRAM_SYNC_INTERVAL_SECONDS = 10 * 60
+
+# Job-model attributes the matcher should treat as JD content. Pulled in
+# this order; missing/empty fields are skipped. Different jobhive connectors
+# expose different field names, so we try the common ones and concatenate
+# whatever's present. Weighting is the matcher's job, not ours.
+JD_TEXT_ATTRS = (
+    "title",
+    "department",
+    "team",
+    "description",
+    "content",
+    "body",
+    "location",
+)
 
 _config_changed = False
 _stop = False
+
+
+@dataclass
+class MatchingState:
+    """Pre-loaded data needed to match a JD against profiles at runtime.
+
+    Built once at startup (and rebuilt alongside config reloads). Held by
+    the tick loop and passed down to `process_fetch_result`, which calls
+    `_match_and_notify` for every newly-seen job.
+
+    Attributes:
+      enabled_profiles: profiles from `profiles.yaml` filtered to
+        `enable: true`. Empty list = matching is a no-op (the pipeline
+        still runs and prints `[NEW]` lines, just nothing is notified).
+      skills_root / roles_root / locations_root: the alias subtrees
+        produced by `verification.match_profile.load_alias_files()`. Held
+        by reference so we don't reload them per-job.
+    """
+
+    enabled_profiles: list[dict] = field(default_factory=list)
+    skills_root: dict = field(default_factory=dict)
+    roles_root: dict = field(default_factory=dict)
+    locations_root: dict = field(default_factory=dict)
 
 
 def load_config(path: Path) -> tuple[list[dict], dict]:
@@ -58,6 +121,65 @@ def _request_stop(signum, _frame) -> None:
     global _stop
     _stop = True
     print(f"\nReceived signal {signum}. Stopping after current tick...", flush=True)
+
+
+def _run_telegram_sync_safely() -> int:
+    """Sync Telegram-bot DMs into `chat_id` fields of `profiles.yaml`.
+
+    This is the main-loop integration of `verification.sync_telegram_chat_ids`.
+    It is wrapped in a hard "never raises" envelope: any failure path
+    (missing `local_secrets`, missing/empty token, Telegram outage,
+    HTTP timeout, malformed payload, …) is logged and swallowed so the
+    main pipeline keeps running. Sync is a convenience, not a hard
+    dependency of the matcher.
+
+    Returns:
+      The number of profile rows actually rewritten in profiles.yaml.
+      Callers should treat any return > 0 as "the on-disk profiles
+      changed; reload matching state next iteration" (see `main()` —
+      this is done by flipping `_config_changed = True`).
+    """
+    # Imported locally so a missing `local_secrets.py` doesn't prevent the
+    # rest of `main.py` from importing — sync becomes an opt-in feature.
+    try:
+        import local_secrets
+    except ModuleNotFoundError:
+        # First-run friendly: no warning storm, just a one-line breadcrumb.
+        print(
+            "  telegram sync: local_secrets.py not found at project root "
+            "— skipping (set telegram_bot_token there to enable)",
+            flush=True,
+        )
+        return 0
+
+    token = getattr(local_secrets, "telegram_bot_token", None)
+    if not isinstance(token, str) or not token.strip():
+        print(
+            "  telegram sync: telegram_bot_token is empty in "
+            "local_secrets.py — skipping",
+            flush=True,
+        )
+        return 0
+
+    try:
+        changes = sync_chat_ids(token, PROFILES_PATH)
+    except SyncError as exc:
+        # SyncError messages are token-scrubbed at the source (see
+        # `fetch_updates` in sync_telegram_chat_ids.py).
+        print(f"  telegram sync failed: {exc}", flush=True)
+        return 0
+    except Exception as exc:
+        # Defensive catch — any unexpected exception must NOT take down
+        # the main pipeline. We deliberately don't re-raise here.
+        print(f"  telegram sync unexpected error: {exc!r}", flush=True)
+        return 0
+
+    if not changes:
+        return 0
+
+    for line in changes:
+        print(f"  telegram sync:{line}", flush=True)
+    return len(changes)
 
 
 def init_db(path: Path) -> sqlite3.Connection:
@@ -287,8 +409,278 @@ def fetch_live_jobs(ats: str, slug: str) -> dict:
         return {"status": "failed", "jobs": [], "error": str(exc)}
 
 
+def _extract_jd_text(job) -> str:
+    """Concatenate every JD-content attribute the job model exposes.
+
+    Different jobhive connectors expose different fields (title is always
+    present; description / content / body vary by ATS). We pull every
+    candidate field in `JD_TEXT_ATTRS`, skip the missing/empty ones, and
+    join the rest with newlines.
+
+    The matcher's `normalize_jd` lowercases and collapses whitespace; HTML
+    tags in description fields don't false-positive because all matching
+    uses extended word boundaries (`[A-Za-z0-9_+#]`) so `<p>backend
+    engineer</p>` matches `backend engineer` cleanly without leaking into
+    the tag chars.
+
+    Returns "" when the job has none of the expected fields populated — the
+    caller treats that as "no signal, skip matching".
+    """
+    parts: list[str] = []
+    for attr in JD_TEXT_ATTRS:
+        value = getattr(job, attr, None)
+        if value:
+            parts.append(str(value))
+    return "\n".join(parts)
+
+
+def load_matching_state() -> MatchingState:
+    """Load profiles + alias trees from disk and pre-filter to enabled profiles.
+
+    Per context.md Rule 1 the caller is expected to have already invoked
+    `validate_profiles(raise_on_error=True)` so an unresolved alias ref or
+    a malformed rule won't reach this function. We re-raise whatever the
+    underlying loaders raise (`FileNotFoundError`, `yaml.YAMLError`,
+    `MatcherError`); the startup path turns those into a hard exit.
+    """
+    skills_root, roles_root, locations_root = load_alias_files()
+    profiles = load_all_profiles()
+    enabled = [
+        p
+        for p in profiles
+        if isinstance(p, dict) and p.get("enable") is True
+    ]
+    return MatchingState(
+        enabled_profiles=enabled,
+        skills_root=skills_root,
+        roles_root=roles_root,
+        locations_root=locations_root,
+    )
+
+
+def _build_notification_text(profile_name: str, job) -> str:
+    """Compose the Telegram message body for a matched (profile, job) pair.
+
+    Returns a Telegram-HTML string. EVERY interpolated value is run
+    through `html.escape` first — job titles, company names, locations
+    and URLs all come from external job-board content and must be
+    treated as untrusted (Secure Python Development rule #5 + #7).
+
+    Layout (rendered in the Telegram chat):
+
+        <b>JOB TITLE</b>
+        Company: ACME
+        Location: Remote
+        Matched profile: <code>yaswanth_backend_distsys</code>
+        Apply / view job  ← link (link preview card shown by Telegram)
+
+    Missing fields are silently omitted rather than printed as "None".
+    """
+    title = getattr(job, "title", None) or "(no title)"
+    company = (
+        getattr(job, "company", None)
+        or getattr(job, "company_name", None)
+        or ""
+    )
+    location = getattr(job, "location", None) or ""
+    url = getattr(job, "url", None) or getattr(job, "apply_url", None) or ""
+
+    lines: list[str] = [f"<b>{html.escape(str(title))}</b>"]
+    if company:
+        lines.append(f"Company: {html.escape(str(company))}")
+    if location:
+        lines.append(f"Location: {html.escape(str(location))}")
+    lines.append(
+        f"Matched profile: <code>{html.escape(str(profile_name))}</code>"
+    )
+    if url:
+        # Telegram requires a fully-qualified URL in href; we only emit
+        # a clickable link when the connector actually provided one.
+        # `html.escape(..., quote=True)` covers the href-attribute case.
+        lines.append(
+            f'<a href="{html.escape(str(url), quote=True)}">Apply / view job</a>'
+        )
+    return "\n".join(lines)
+
+
+def notify(profile: dict, job, match_result: MatchResult) -> None:
+    """Send a Telegram notification for one matched (profile, job) pair.
+
+    The message goes to the `chat_id` of the matched profile, using the
+    bot token from `local_secrets.telegram_bot_token`. The body
+    contains the job title, company / location when available, the
+    matched profile name, and a clickable link to the job posting
+    (Telegram renders a preview card from the link).
+
+    Graceful-degradation matrix (each step logs ONE breadcrumb and
+    returns; the pipeline keeps running):
+      * profile has no `chat_id` (owner hasn't DM'd the bot yet) → skip.
+      * `local_secrets.py` is missing                              → skip.
+      * `telegram_bot_token` is empty                              → skip.
+      * Telegram `sendMessage` fails (network / API error)         → log + skip.
+
+    The pre-existing `[MATCH]` console line is preserved unchanged so
+    developers still get local visibility even when Telegram delivery
+    is disabled (no token) or unavailable (network outage).
+
+    This function is wrapped in a try/except by `_match_and_notify`,
+    but we ALSO catch internally so that a Telegram outage shows up
+    as a clear `notify:` breadcrumb rather than a generic
+    `notify failed for profile ...` line.
+
+    Args:
+      profile: the matched profile dict (as parsed from profiles.yaml).
+        Has at minimum `profile_name`, `chat_id` (possibly None / empty),
+        `enable`, `years_of_experience`, `locations`, `matching_rules`.
+      job: the jobhive job model that matched (`title`, usually
+        `url` / `apply_url`, sometimes `company` / `location`).
+      match_result: the full `MatchResult`. Currently unused by the
+        notification body — kept in the signature because callers and
+        tests pass it, and a future change may want to attach the
+        per-rule scoring breakdown to the message.
+    """
+    profile_name = profile.get("profile_name") or "<unnamed>"
+    title = getattr(job, "title", None)
+    url = getattr(job, "url", None) or getattr(job, "apply_url", None)
+
+    # Keep the local visibility line REGARDLESS of Telegram delivery so
+    # console tail + log scrapes still see every match.
+    print(
+        f"      [MATCH] profile={profile_name} title={title!r} url={url}",
+        flush=True,
+    )
+
+    chat_id = profile.get("chat_id")
+    if not isinstance(chat_id, int):
+        # `bool` is a subclass of int — exclude True/False as nonsense
+        # chat_ids. Empty / None / str are all "owner hasn't bound yet".
+        if isinstance(chat_id, bool) or chat_id is None or chat_id == "":
+            print(
+                f"      notify: profile {profile_name!r} has no chat_id "
+                "(owner needs to DM the bot a `profile=<name>` message); "
+                "Telegram delivery skipped",
+                flush=True,
+            )
+        else:
+            # Anything else (str with content, list, dict, ...) means the
+            # YAML was edited by hand into a bad shape — surface that.
+            print(
+                f"      notify: profile {profile_name!r} has malformed "
+                f"chat_id ({type(chat_id).__name__}); "
+                "Telegram delivery skipped",
+                flush=True,
+            )
+        return
+
+    # Lazy import keeps `main.py` importable on a fresh checkout that
+    # doesn't yet have `local_secrets.py` (the test suite depends on
+    # this). Catch `ImportError` (parent of `ModuleNotFoundError`) so
+    # both a missing file AND an `sys.modules[...] = None` test patch
+    # are handled uniformly.
+    try:
+        import local_secrets  # noqa: WPS433 (intentional runtime import)
+    except ImportError:
+        print(
+            "      notify: local_secrets.py not found at project root "
+            "— Telegram delivery skipped",
+            flush=True,
+        )
+        return
+
+    token = getattr(local_secrets, "telegram_bot_token", None)
+    if not isinstance(token, str) or not token.strip():
+        print(
+            "      notify: telegram_bot_token is empty in local_secrets.py "
+            "— Telegram delivery skipped",
+            flush=True,
+        )
+        return
+
+    text = _build_notification_text(profile_name, job)
+
+    try:
+        send_message(token, chat_id, text)
+    except SyncError as exc:
+        # SyncError messages are token-scrubbed at the source.
+        print(
+            f"      notify: Telegram delivery failed for "
+            f"profile {profile_name!r}: {exc}",
+            flush=True,
+        )
+    except Exception as exc:
+        # Defensive — any unexpected exception in the Telegram path must
+        # not propagate. `_match_and_notify` would also catch this, but
+        # we want the breadcrumb to read `notify:` not `notify failed`.
+        print(
+            f"      notify: Telegram delivery unexpected error for "
+            f"profile {profile_name!r}: {exc!r}",
+            flush=True,
+        )
+
+
+def _match_and_notify(job, matching_state: "MatchingState | None") -> None:
+    """Evaluate `job` against every enabled profile; call `notify` per match.
+
+    No-op when `matching_state` is None or has no enabled profiles —
+    this is the common case when the user hasn't enabled any profile yet,
+    and the pipeline should still run + dedupe + print `[NEW]` lines.
+
+    Error handling is deliberately defensive:
+      * Any `MatcherError` (or unexpected exception) from
+        `match_profile_against_jd` is caught per-profile and logged. We
+        do NOT abort the rest of the loop — one bad profile shouldn't
+        silence matches from the other profiles.
+      * Any exception from `notify` is caught for the same reason — the
+        notify stub is going to be replaced with real I/O (Slack/HTTP)
+        and a transient failure there shouldn't take down the tick.
+    """
+    if matching_state is None or not matching_state.enabled_profiles:
+        return
+
+    jd_text = _extract_jd_text(job)
+    if not jd_text.strip():
+        return
+
+    for profile in matching_state.enabled_profiles:
+        profile_name = profile.get("profile_name") or "<unnamed>"
+        try:
+            result = match_profile_against_jd(
+                profile,
+                jd_text,
+                matching_state.skills_root,
+                matching_state.roles_root,
+                matching_state.locations_root,
+            )
+        except Exception as exc:
+            # Catch-all (not just MatcherError) because a profile dict with
+            # weird shapes could trigger AttributeError / TypeError inside
+            # the matcher; we still don't want that to kill the tick.
+            print(
+                f"      match error for profile {profile_name!r}: {exc!r}",
+                flush=True,
+            )
+            continue
+
+        if not result.passed:
+            continue
+
+        try:
+            notify(profile, job, result)
+        except Exception as exc:
+            # The notify stub is going to be replaced with real I/O; if a
+            # future implementation throws (network error, etc.) we log
+            # and move on rather than dropping subsequent profiles.
+            print(
+                f"      notify failed for profile {profile_name!r}: {exc!r}",
+                flush=True,
+            )
+
+
 def process_fetch_result(
-    conn: sqlite3.Connection, company: dict, result: dict
+    conn: sqlite3.Connection,
+    company: dict,
+    result: dict,
+    matching_state: "MatchingState | None" = None,
 ) -> None:
     """Apply DB writes for one fetch result. Runs in the main thread only.
 
@@ -352,18 +744,24 @@ def process_fetch_result(
         already_seen = record_job_id(conn, slug, job_id)
         if already_seen:
             repeat_count += 1
-        else:
-            new_count += 1
+            # Repeats stay silent; they're still counted in the summary line.
+            continue
+        new_count += 1
 
-        title = getattr(job, "title", None)
-        location = getattr(job, "location", None)
-        url = getattr(job, "url", None) or getattr(job, "apply_url", None)
-        posted_at = _extract_posted_at(job)
-        marker = "REPEAT" if already_seen else "NEW   "
-        print(
-            f"    [{marker}] {title} | {location} | posted={posted_at} | {url}",
-            flush=True,
-        )
+        # Per-job [NEW] line silenced on purpose — the summary line below
+        # (` ... ok (N jobs, K new, ...)`) carries the only count we want
+        # routinely. Matched profiles still produce their own `[MATCH]`
+        # line via `notify`, so notable jobs are NOT lost in the silence.
+        # Uncomment the block below to re-enable per-job visibility.
+        # title = getattr(job, "title", None)
+        # location = getattr(job, "location", None)
+        # url = getattr(job, "url", None) or getattr(job, "apply_url", None)
+        # posted_at = _extract_posted_at(job)
+        # print(
+        #     f"    [NEW] {title} | {location} | posted={posted_at} | {url}",
+        #     flush=True,
+        # )
+        _match_and_notify(job, matching_state)
 
     summary_bits = [f"{len(jobs)} jobs"]
     if too_old_count:
@@ -382,14 +780,18 @@ def process_fetch_result(
     clear_rate_limit(conn, platform)
 
 
-def fetch_company(conn: sqlite3.Connection, company: dict) -> None:
+def fetch_company(
+    conn: sqlite3.Connection,
+    company: dict,
+    matching_state: "MatchingState | None" = None,
+) -> None:
     """Sequential fetch + process for one company (kept for callers that don't
     want parallelism). The tick loop uses a thread pool directly, so this is
     not on the main hot path."""
     slug = str(company.get("slug") or "?")
     platform = str(company.get("ats_platform") or "?")
     result = fetch_live_jobs(platform, slug)
-    process_fetch_result(conn, company, result)
+    process_fetch_result(conn, company, result, matching_state)
 
 
 def is_platform_in_cooldown(conn: sqlite3.Connection, platform: str) -> bool:
@@ -470,6 +872,7 @@ def tick(
     companies: list[dict],
     platforms: dict,
     db_conn: sqlite3.Connection,
+    matching_state: "MatchingState | None" = None,
 ) -> None:
     """Single iteration of the pipeline.
 
@@ -532,7 +935,7 @@ def tick(
                     # fetch_live_jobs catches its own exceptions, so this is
                     # defensive (e.g., for unexpected pool errors).
                     result = {"status": "failed", "jobs": [], "error": str(exc)}
-                process_fetch_result(db_conn, company, result)
+                process_fetch_result(db_conn, company, result, matching_state)
 
 def main() -> int:
     global _config_changed
@@ -553,17 +956,38 @@ def main() -> int:
     _config_changed = True
     companies: list[dict] = []
     platforms: dict = {}
+    matching_state: MatchingState | None = None
 
     db_conn = init_db(DB_PATH)
     print(f"Opened SQLite DB at {DB_PATH.name}", flush=True)
 
     last_cleanup_at = time.monotonic()
+    # 0.0 (not monotonic()) so the first tick triggers a Telegram sync
+    # immediately — that way startup picks up any chat_id binding the
+    # owner sent before launching `main.py`. If the token is missing,
+    # `_run_telegram_sync_safely` returns 0 and logs a one-liner.
+    last_telegram_sync_at = 0.0
 
     try:
         tick_number = 0
         while not _stop:
             tick_number += 1
             started = time.monotonic()
+
+            # Sync Telegram-driven chat_id bindings before validating /
+            # loading matching state — so any changes the sync wrote are
+            # picked up by this same iteration's reload below. The sync
+            # itself never raises (see `_run_telegram_sync_safely`).
+            if started - last_telegram_sync_at >= TELEGRAM_SYNC_INTERVAL_SECONDS:
+                applied = _run_telegram_sync_safely()
+                last_telegram_sync_at = started
+                if applied > 0:
+                    # Force the reload block to re-validate profiles
+                    # (Rule 1) and rebuild matching_state with the new
+                    # chat_id values. This is the same mechanism that
+                    # picks up an external edit to profiles.yaml.
+                    _config_changed = True
+
             if _config_changed:
                 try:
                     companies, platforms = load_config(CONFIG_PATH)
@@ -571,6 +995,50 @@ def main() -> int:
                     print(f"Failed to load config: {exc}", file=sys.stderr, flush=True)
                     return 1
                 _log_config_summary(companies, platforms)
+
+                # Per context.md "Rule 1 — Validate profiles after EVERY edit":
+                # validate profiles/aliases BEFORE loading matching state,
+                # and refuse to start if validation fails. A typo here would
+                # silently degrade matching, which is exactly the failure
+                # mode this project cannot tolerate.
+                try:
+                    validate_profiles(raise_on_error=True)
+                except ValidationError as exc:
+                    print(
+                        "profile/alias validation failed; refusing to start:\n"
+                        f"{exc}",
+                        file=sys.stderr,
+                        flush=True,
+                    )
+                    return 1
+
+                try:
+                    matching_state = load_matching_state()
+                except (MatcherError, FileNotFoundError, yaml.YAMLError) as exc:
+                    print(
+                        f"failed to load matching state: {exc}",
+                        file=sys.stderr,
+                        flush=True,
+                    )
+                    return 1
+
+                n_enabled = len(matching_state.enabled_profiles)
+                if n_enabled == 0:
+                    print(
+                        "Loaded matching state: 0 enabled profile(s) — "
+                        "matching is a no-op until a profile is enabled.",
+                        flush=True,
+                    )
+                else:
+                    names = ", ".join(
+                        repr(p.get("profile_name"))
+                        for p in matching_state.enabled_profiles
+                    )
+                    print(
+                        f"Loaded matching state: {n_enabled} enabled profile(s): "
+                        f"{names}",
+                        flush=True,
+                    )
                 _config_changed = False
 
             # Hourly: drop job IDs older than the 24-hour retention window.
@@ -586,7 +1054,7 @@ def main() -> int:
                 last_cleanup_at = started
 
             try:
-                tick(tick_number, companies, platforms, db_conn)
+                tick(tick_number, companies, platforms, db_conn, matching_state)
             except Exception as exc:
                 print(f"tick #{tick_number} failed: {exc!r}", flush=True)
 

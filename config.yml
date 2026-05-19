@@ -125,252 +125,406 @@
     notes: Modern digital interface.
 
 companies:
+#not working
   - slug: swiggy
     company_name: Swiggy
     ats_platform: workday
     enable: false
-
-  - slug: razorpay
+#working
+  - slug: razorpaysoftwareprivatelimited
     company_name: Razorpay
     ats_platform: greenhouse
     enable: false
-
+#working
   - slug: groww
     company_name: Groww
     ats_platform: greenhouse
     enable: true
-
+#not working
   - slug: meesho
     company_name: Meesho
     ats_platform: greenhouse
     enable: false
-
+#working
   - slug: cred
     company_name: Cred
-    ats_platform: greenhouse
+    ats_platform: level
     enable: true
-
+#working
   - slug: inmobi
     company_name: InMobi
     ats_platform: greenhouse
     enable: true
-
+#not working
   - slug: zepto
     company_name: Zepto
     ats_platform: greenhouse
     enable: false
-
+#not working
   - slug: juspay
     company_name: Juspay
     ats_platform: greenhouse
     enable: false
-
+#not working
   - slug: coinswitch
     company_name: CoinSwitch
     ats_platform: greenhouse
     enable: false
-
+#not working
   - slug: urbancompany
     company_name: Urban Company
     ats_platform: greenhouse
     enable: false
-
+#not working
   - slug: zeta
     company_name: Zeta
     ats_platform: greenhouse
     enable: false
-
+#not working
   - slug: browserstack
     company_name: BrowserStack
     ats_platform: ashby
-    enable: true
-
+    enable: false
+#working
   - slug: postman
     company_name: Postman
     ats_platform: greenhouse
     enable: true
-
+#working
+  - slug: airbnb
+    company_name: Airbnb
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: pinterest
+    company_name: Pinterest
+    ats_platform: greenhouse
+    enable: true
+#not working
   - slug: cloudera
     company_name: Cloudera
     ats_platform: greenhouse
     enable: false
-
+#working
   - slug: rubrik
     company_name: Rubrik
     ats_platform: greenhouse
-    enable: false
-
+    enable: true
+#not working
   - slug: cohesity
     company_name: Cohesity
     ats_platform: greenhouse
     enable: false
-
+#not working
   - slug: confluent
     company_name: Confluent
     ats_platform: greenhouse
     enable: false
-
+#not working
   - slug: snowflake
     company_name: Snowflake
     ats_platform: greenhouse
-    enable: true
-
+    enable: false
+#working
   - slug: databricks
     company_name: Databricks
     ats_platform: greenhouse
-    enable: false
-
+    enable: true
+#working
   - slug: twilio
     company_name: Twilio
     ats_platform: greenhouse
-    enable: false
-
+    enable: true
+#working but returning 0
   - slug: hotstar
     company_name: Hotstar (Disney+)
     ats_platform: lever
-    enable: true
-
+    enable: false
+#working but returning 0
   - slug: atlassian
     company_name: Atlassian
     ats_platform: lever
     enable: false
-
+#not working
   - slug: gojek
     company_name: Gojek
     ats_platform: lever
     enable: false
-
+#not working
   - slug: grab
     company_name: Grab
     ats_platform: lever
-    enable: true
-
+    enable: false
+#working but returning 0
   - slug: pocketfm
     company_name: Pocket FM
     ats_platform: lever
     enable: false
-
+#not working
+  - slug: phonepe
+    company_name: Phone Pe
+    ats_platform: lever
+    enable: true
+#not working
   - slug: blinkit
     company_name: Blinkit
     ats_platform: lever
     enable: false
-
+#not working
   - slug: pharmeasy
     company_name: Pharmeasy
     ats_platform: lever
     enable: false
-
+#not working
   - slug: nykaa
     company_name: Nykaa
     ats_platform: lever
     enable: false
-
+#not working
   - slug: delhivery
     company_name: Delhivery
     ats_platform: lever
     enable: false
-
+#not working
   - slug: upstox
     company_name: Upstox
     ats_platform: lever
-    enable: true
-
+    enable: false
+#working but returning 0
   - slug: freshworks
     company_name: Freshworks
     ats_platform: lever
     enable: false
-
+#not working
   - slug: chargebee
     company_name: Chargebee
     ats_platform: lever
     enable: false
-
+#not working
   - slug: clevertap
     company_name: CleverTap
     ats_platform: lever
     enable: false
-
+#not working
   - slug: whatfix
     company_name: Whatfix
     ats_platform: lever
     enable: false
-
+#working
   - slug: mindtickle
     company_name: Mindtickle
     ats_platform: lever
-    enable: false
-
+    enable: true
+#working
   - slug: openai
     company_name: OpenAI
     ats_platform: ashby
-    enable: false
-
+    enable: true
+#working
   - slug: notion
     company_name: Notion
     ats_platform: ashby
-    enable: false
-
+    enable: true
+#working
   - slug: vanta
     company_name: Vanta
     ats_platform: ashby
-    enable: false
-
+    enable: true
+#not working
   - slug: figma
     company_name: Figma
     ats_platform: ashby
-    enable: true
-
+    enable: false
+#not working
   - slug: chronosphere
     company_name: Chronosphere
     ats_platform: ashby
     enable: false
-
+#not working
   - slug: autodesk
     company_name: Autodesk
     ats_platform: workday
     enable: false
-
+#not working
   - slug: adobe
     company_name: Adobe
     ats_platform: workday
     enable: false
-
+#not working
   - slug: cisco
     company_name: Cisco
     ats_platform: workday
     enable: false
-
+#not working
   - slug: salesforce
     company_name: Salesforce
     ats_platform: workday
     enable: false
-
+#not working
   - slug: intuit
     company_name: Intuit
     ats_platform: workday
     enable: false
-
+#not working
   - slug: paypal
     company_name: PayPal
     ats_platform: workday
     enable: false
-
+#not working
   - slug: nvidia
     company_name: NVIDIA
     ats_platform: workday
     enable: false
-
+#not working
   - slug: amd
     company_name: AMD
     ats_platform: workday
     enable: false
-
+#not working
   - slug: qualcomm
     company_name: Qualcomm
     ats_platform: workday
     enable: false
-
+#not working
   - slug: servicenow
     company_name: ServiceNow
     ats_platform: workday
+    enable: false
+
+  # --- Greenhouse: US/global product engineering boards ---
+#working
+  - slug: stripe
+    company_name: Stripe
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: affirm
+    company_name: Affirm
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: elastic
+    company_name: Elastic
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: okta
+    company_name: Okta
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: ripple
+    company_name: Ripple
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: gitlab
+    company_name: GitLab
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: chime
+    company_name: Chime
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: datadog
+    company_name: Datadog
+    ats_platform: greenhouse
+    enable: true
+#working - corrected slug from "harness" to "harnessinc"
+  - slug: harnessinc
+    company_name: Harness
+    ats_platform: greenhouse
+    enable: true
+#working - corrected slug from ashby/sourcegraph to greenhouse/sourcegraph91
+  - slug: sourcegraph91
+    company_name: Sourcegraph
+    ats_platform: greenhouse
+    enable: true
+
+  # --- SmartRecruiters: companies relocated off lever/greenhouse ---
+#working - moved from lever/canva (board didn't exist) to smartrecruiters/canva
+  - slug: canva
+    company_name: Canva
+    ats_platform: smartrecruiters
+    enable: true
+#working - moved from lever/deliveryhero (board didn't exist) to smartrecruiters/deliveryhero
+  - slug: deliveryhero
+    company_name: Delivery Hero
+    ats_platform: smartrecruiters
+    enable: true
+
+  # --- Ashby: lean / AI-centric scale-ups ---
+#working
+  - slug: replit
+    company_name: Replit
+    ats_platform: ashby
+    enable: true
+#working
+  - slug: linear
+    company_name: Linear
+    ats_platform: ashby
+    enable: true
+#working
+  - slug: perplexity
+    company_name: Perplexity AI
+    ats_platform: ashby
+    enable: true
+#working
+  - slug: warp
+    company_name: Warp
+    ats_platform: ashby
+    enable: true
+#working
+  - slug: clerk
+    company_name: Clerk
+    ats_platform: ashby
+    enable: true
+#working
+  - slug: supabase
+    company_name: Supabase
+    ats_platform: ashby
+    enable: true
+#working - moved from lever/mural (board didn't exist) to ashby/mural
+  - slug: mural
+    company_name: Mural
+    ats_platform: ashby
+    enable: true
+
+  # --- Not working: tried multiple ATS platforms, no public board located ---
+#not working - tried greenhouse(booking/bookingcom/bookingholdings), lever, workable, recruitee, smartrecruiters (tenant empty), teamtailor. Booking.com likely on Workday.
+  - slug: booking
+    company_name: Booking.com
+    ats_platform: greenhouse
+    enable: false
+#not working - tried greenhouse(coinbase/coinbase77/coinbaseglobal/coinbasecareers), lever, ashby, workable, smartrecruiters (tenant empty), teamtailor. Coinbase likely on own careers portal.
+  - slug: coinbase
+    company_name: Coinbase
+    ats_platform: greenhouse
+    enable: false
+#not working - tried greenhouse(hashicorp/hashicorpinc/hashicorpcareers/hashicorp1/hashicorp77), lever, ashby, workable, smartrecruiters (tenant empty), teamtailor. Likely migrated to IBM Workday.
+  - slug: hashicorp
+    company_name: HashiCorp
+    ats_platform: greenhouse
+    enable: false
+#not working - tried lever, greenhouse(moengage/moengageinc), ashby, workable, smartrecruiters (tenant empty), recruitee, teamtailor, breezy.
+  - slug: moengage
+    company_name: MoEngage
+    ats_platform: lever
+    enable: false
+#not working - tried lever, greenhouse(headspace/headspacehealth/headspacehealth1/ginger), ashby, workable, smartrecruiters (tenant empty), teamtailor.
+  - slug: headspace
+    company_name: Headspace
+    ats_platform: lever
+    enable: false
+#not working - tried lever, greenhouse(sirionlabs/sirion), ashby, workable, smartrecruiters (tenant empty), recruitee, teamtailor, breezy.
+  - slug: sirionlabs
+    company_name: SirionLabs
+    ats_platform: lever
+    enable: false
+#not working - tried ashby(dub/dubinc/dubco/dub-co/dubcompany), greenhouse, lever, workable, breezy, recruitee, teamtailor.
+  - slug: dub
+    company_name: Dub.co
+    ats_platform: ashby
     enable: false
