@@ -4,16 +4,16 @@ Use this to verify a single (ats, slug) pair, debug suspected wrong slugs,
 inspect what jobhive actually returns, or sanity-check rate-limit/error paths
 without bringing up the full pipeline.
 
-Usage:
-    python try_fetch.py <ats> <slug>                # fetch one (prints all jobs)
-    python try_fetch.py <ats> <slug> --limit 5      # only print first 5 jobs
-    python try_fetch.py <ats> <slug> --raw          # also dump model_dump JSON
-    python try_fetch.py --examples                  # try a handful of known slugs
+Usage (run from the project root):
+    python verification/try_fetch.py <ats> <slug>            # fetch one (prints all jobs)
+    python verification/try_fetch.py <ats> <slug> --limit 5  # only print first 5 jobs
+    python verification/try_fetch.py <ats> <slug> --raw      # also dump model_dump JSON
+    python verification/try_fetch.py --examples              # try a handful of known slugs
 
 Examples:
-    python try_fetch.py greenhouse swiggy
-    python try_fetch.py lever atlassian
-    python try_fetch.py ashby openai
+    python verification/try_fetch.py greenhouse swiggy
+    python verification/try_fetch.py lever atlassian
+    python verification/try_fetch.py ashby openai
 """
 
 from __future__ import annotations
@@ -22,10 +22,16 @@ import argparse
 import json
 import sys
 import traceback
+from pathlib import Path
 
-from main import _extract_job_id, _extract_posted_at, fetch_live_jobs
+# Resolve project root one level above this file and put it on sys.path so
+# `from main import ...` works whether this script is run directly or via -m.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-# A small spread across ATSes for quick smoke tests.
+from main import _extract_job_id, _extract_posted_at, fetch_live_jobs  # noqa: E402
+
 EXAMPLES: list[tuple[str, str]] = [
     ("greenhouse", "swiggy"),
     ("greenhouse", "razorpay"),

@@ -5,6 +5,11 @@
 #
 # Fields per profile:
 #   profile_name         unique string id
+#   chat_id              Telegram chat_id (int) that owns this profile. Left
+#                        empty (null) by default. Auto-populated by
+#                        `verification/sync_telegram_chat_ids.py` when the
+#                        owner DMs the bot a message containing
+#                        `profile=<profile_name>`. Do NOT edit by hand.
 #   enable               bool; false → skipped. ALWAYS default to false for new
 #                        profiles; flip to true only once the profile is tuned
 #                        and you actually want it producing matches.
@@ -41,6 +46,7 @@ profiles:
   # Profile: Yaswanth — backend / distributed systems
   # ─────────────────────────────────────────────────────────────────────
   - profile_name: yaswanth_backend_distsys
+    chat_id: 925911559   # auto-populated; see verification/sync_telegram_chat_ids.py
     enable: false   # default false; flip to true when ready to use
     years_of_experience: 2.75   # 2 years 9 months (Aug 2023 → ~May 2026)
     locations:
@@ -116,10 +122,97 @@ profiles:
           skills.observability.distributed_tracing=1,
           totalscore>=5
 
+
+  - profile_name: yaswanth_backend_distsys_golang
+    chat_id: 925911559   # auto-populated; see verification/sync_telegram_chat_ids.py
+    enable: true   # default false; flip to true when ready to use
+    years_of_experience: 2.75   # 2 years 9 months (Aug 2023 → ~May 2026)
+    # NOTE: this `locations:` list is informational only — the matcher
+    # does NOT read it. The actual location filter is enforced by the
+    # boolean rule below, which mirrors this list. Keep the two in sync
+    # whenever you add/remove a location.
+    locations:
+      - locations.india.bengaluru
+      - locations.india.hyderabad
+    matching_rules:
+
+      - type: boolean
+        description: >
+          Rule must be backend or distributed systems role or platform engineer role
+          Excludes mobile, ML, data, security, and test-engineering roles.
+          Includes golang or java
+        expression: >
+          (roles.role_families.backend_engineer
+          or roles.role_families.distributed_systems_engineer
+          or roles.role_families.platform_engineer)
+          and (skills.languages.go
+          or skills.languages.java)
+          and not (roles.role_families.mobile_engineer
+          or roles.role_families.security_engineer
+          or roles.data_ml_roles.data_scientist
+          or roles.role_families.test_engineer)
+
+      - type: boolean
+        description: Excludes interns and pure new-grad-only postings.
+        expression: >
+          not roles.seniority_modifiers.intern
+          and not roles.seniority_modifiers.new_grad
+
+      - type: boolean
+        description: >
+          Location filter — JD must mention Bengaluru, Hyderabad, or be
+          remote. The matcher scans the whole JD text (title +
+          department + team + description + content + body + the job's
+          `location` field), so a posting whose `location` field reads
+          "Bengaluru, KA, IN" or "Remote" satisfies this; a posting
+          whose `location` reads "Nicosia, cy" does not.
+          Keep in sync with the `locations:` list above.
+        expression: >
+          locations.india.bengaluru
+          or locations.india.hyderabad
+          or locations.work_modes.remote
+
+
+  - profile_name: nistha_fullstack
+    chat_id:        # auto-populated; see verification/sync_telegram_chat_ids.py
+    enable: false   # default false; flip to true when ready to use
+    years_of_experience: 2.75
+    locations:
+      - locations.india.bengaluru
+      - locations.india.hyderabad
+      - locations.india.pune
+      - locations.india.chennai
+      - locations.india.mumbai
+      - locations.india.kolkata
+      - locations.india.gurgaon
+      - locations.india.noida
+      - locations.work_modes.remote
+    matching_rules:
+      - type: boolean
+        description: >
+          Any SWE-ish role except clearly-unrelated specializations.
+          Should be backend or fullstack or general swe 
+          Should have java or python or javascript or typescript
+          should not be mobile or security or data or test engineer
+        expression: >
+          (roles.generic_swe.software_engineer
+            or roles.role_families.backend_engineer
+            or roles.role_families.fullstack_engineer
+            or roles.role_families.platform_engineer)
+          and not roles.role_families.mobile_engineer
+          and not roles.role_families.security_engineer
+          and not roles.data_ml_roles.data_scientist
+          and (skills.languages.java
+            or skills.languages.python
+            or skills.languages.javascript
+            or skills.languages.typescript)
+          
+
   # ─────────────────────────────────────────────────────────────────────
   # Profile: Yaswanth — fullstack (looser filter, broader net)
   # ─────────────────────────────────────────────────────────────────────
   - profile_name: yaswanth_fullstack_broad
+    chat_id:        # auto-populated; see verification/sync_telegram_chat_ids.py
     enable: false   # default false; flip to true when ready to use
     years_of_experience: 2.75
     locations:
@@ -147,3 +240,8 @@ profiles:
           or skills.backend_frameworks.spring_boot
           or skills.backend_frameworks.helidon
           or skills.frontend_frameworks.react
+
+
+
+
+#TODO: Update the code to do matching based on the location field rather than taking form the rules and something, I am still getting jobs in spain

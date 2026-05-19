@@ -6,3 +6,6 @@ __pycache__/
 *.db
 output/
 .DS_Store
+
+# Local secrets — populated per-checkout, never committed.
+local_secrets.py

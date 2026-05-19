@@ -192,12 +192,12 @@ companies:
     enable: true
 #working
   - slug: airbnb
-    company_name: Postman
+    company_name: Airbnb
     ats_platform: greenhouse
     enable: true
 #working
   - slug: pinterest
-    company_name: Postman
+    company_name: Pinterest
     ats_platform: greenhouse
     enable: true
 #not working
@@ -262,7 +262,7 @@ companies:
     enable: false
 #not working
   - slug: phonepe
-    company_name: Pocket FM
+    company_name: Phone Pe
     ats_platform: lever
     enable: true
 #not working
@@ -389,4 +389,142 @@ companies:
   - slug: servicenow
     company_name: ServiceNow
     ats_platform: workday
+    enable: false
+
+  # --- Greenhouse: US/global product engineering boards ---
+#working
+  - slug: stripe
+    company_name: Stripe
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: affirm
+    company_name: Affirm
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: elastic
+    company_name: Elastic
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: okta
+    company_name: Okta
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: ripple
+    company_name: Ripple
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: gitlab
+    company_name: GitLab
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: chime
+    company_name: Chime
+    ats_platform: greenhouse
+    enable: true
+#working
+  - slug: datadog
+    company_name: Datadog
+    ats_platform: greenhouse
+    enable: true
+#working - corrected slug from "harness" to "harnessinc"
+  - slug: harnessinc
+    company_name: Harness
+    ats_platform: greenhouse
+    enable: true
+#working - corrected slug from ashby/sourcegraph to greenhouse/sourcegraph91
+  - slug: sourcegraph91
+    company_name: Sourcegraph
+    ats_platform: greenhouse
+    enable: true
+
+  # --- SmartRecruiters: companies relocated off lever/greenhouse ---
+#working - moved from lever/canva (board didn't exist) to smartrecruiters/canva
+  - slug: canva
+    company_name: Canva
+    ats_platform: smartrecruiters
+    enable: true
+#working - moved from lever/deliveryhero (board didn't exist) to smartrecruiters/deliveryhero
+  - slug: deliveryhero
+    company_name: Delivery Hero
+    ats_platform: smartrecruiters
+    enable: true
+
+  # --- Ashby: lean / AI-centric scale-ups ---
+#working
+  - slug: replit
+    company_name: Replit
+    ats_platform: ashby
+    enable: true
+#working
+  - slug: linear
+    company_name: Linear
+    ats_platform: ashby
+    enable: true
+#working
+  - slug: perplexity
+    company_name: Perplexity AI
+    ats_platform: ashby
+    enable: true
+#working
+  - slug: warp
+    company_name: Warp
+    ats_platform: ashby
+    enable: true
+#working
+  - slug: clerk
+    company_name: Clerk
+    ats_platform: ashby
+    enable: true
+#working
+  - slug: supabase
+    company_name: Supabase
+    ats_platform: ashby
+    enable: true
+#working - moved from lever/mural (board didn't exist) to ashby/mural
+  - slug: mural
+    company_name: Mural
+    ats_platform: ashby
+    enable: true
+
+  # --- Not working: tried multiple ATS platforms, no public board located ---
+#not working - tried greenhouse(booking/bookingcom/bookingholdings), lever, workable, recruitee, smartrecruiters (tenant empty), teamtailor. Booking.com likely on Workday.
+  - slug: booking
+    company_name: Booking.com
+    ats_platform: greenhouse
+    enable: false
+#not working - tried greenhouse(coinbase/coinbase77/coinbaseglobal/coinbasecareers), lever, ashby, workable, smartrecruiters (tenant empty), teamtailor. Coinbase likely on own careers portal.
+  - slug: coinbase
+    company_name: Coinbase
+    ats_platform: greenhouse
+    enable: false
+#not working - tried greenhouse(hashicorp/hashicorpinc/hashicorpcareers/hashicorp1/hashicorp77), lever, ashby, workable, smartrecruiters (tenant empty), teamtailor. Likely migrated to IBM Workday.
+  - slug: hashicorp
+    company_name: HashiCorp
+    ats_platform: greenhouse
+    enable: false
+#not working - tried lever, greenhouse(moengage/moengageinc), ashby, workable, smartrecruiters (tenant empty), recruitee, teamtailor, breezy.
+  - slug: moengage
+    company_name: MoEngage
+    ats_platform: lever
+    enable: false
+#not working - tried lever, greenhouse(headspace/headspacehealth/headspacehealth1/ginger), ashby, workable, smartrecruiters (tenant empty), teamtailor.
+  - slug: headspace
+    company_name: Headspace
+    ats_platform: lever
+    enable: false
+#not working - tried lever, greenhouse(sirionlabs/sirion), ashby, workable, smartrecruiters (tenant empty), recruitee, teamtailor, breezy.
+  - slug: sirionlabs
+    company_name: SirionLabs
+    ats_platform: lever
+    enable: false
+#not working - tried ashby(dub/dubinc/dubco/dub-co/dubcompany), greenhouse, lever, workable, breezy, recruitee, teamtailor.
+  - slug: dub
+    company_name: Dub.co
+    ats_platform: ashby
     enable: false

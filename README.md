@@ -9,19 +9,18 @@ See [context.md](context.md) for full architectural details and current developm
 | File | What it is | Status |
 |---|---|---|
 | `main.py` | The continuous pipeline (tick every 5s). | implemented |
-| `try_fetch.py` | One-shot CLI tester for a single `(ats, slug)` pair. | implemented |
 | `config.yml` | ATS-platform rate-limit settings + the list of companies to fetch. | implemented |
 | `skill_aliases.yml` | Canonical skills & roles + every alias the matcher should treat as equivalent. | config only — matcher pending |
 | `location_aliases.yml` | Canonical locations (India + US California + work modes) + aliases. | config only — matcher pending |
 | `profiles.yaml` | Candidate profiles: years of experience, preferred locations, and boolean / scored matching rules. | config only — matcher pending |
-| `validate_profiles.py` | Validator for the three files above. **Run it after every edit.** | implemented |
+| `verification/` | Standalone scripts for verifying / testing parts of the system in isolation. See [Verification scripts](#verification-scripts). | implemented |
 | `pipeline_state.db` | SQLite operational state (last-fetch timestamps, rate-limit cooldowns, 24h job-id dedupe). Auto-created. | implemented |
 
 > **Heads-up:** the alias files and `profiles.yaml` are the *spec* for the matcher (Steps 4 & 5 of the pipeline). The matcher itself is not yet built, so editing those files doesn't yet change runtime behavior — but the validator already checks them end-to-end so they stay consistent.
 
 ## Two non-negotiable rules
 
-1. **After ANY edit to `profiles.yaml`, `skill_aliases.yml`, or `location_aliases.yml`, run `python validate_profiles.py`.** It must exit 0. The validator catches duplicate profile names, malformed `years_of_experience`, broken matching-rule syntax, and — most importantly — every dotted reference like `skills.languages.go` that doesn't resolve into the alias files.
+1. **After ANY edit to `profiles.yaml`, `skill_aliases.yml`, or `location_aliases.yml`, run `python verification/validate_profiles.py`.** It must exit 0. The validator catches duplicate profile names, malformed `years_of_experience`, broken matching-rule syntax, and — most importantly — every dotted reference like `skills.languages.go` that doesn't resolve into the alias files.
 2. **Every skill on a candidate's resume MUST have an alias group in `skill_aliases.yml` before being referenced from `profiles.yaml`.** If a skill is missing from the alias file, the matcher will silently fail to match jobs requiring that skill, with no warning. Workflow: list skills → grep `skill_aliases.yml` → add anything missing → validate.
 
 ## Job Fetcher Features
@@ -70,7 +69,7 @@ Three files cooperate to drive matching once the matcher is built. You can fill 
 ### 4. Validate after every config edit
 
 ```bash
-python validate_profiles.py
+python verification/validate_profiles.py
 ```
 
 Exit code `0` = OK, exit code `1` = one or more errors printed. The validator checks all three YAML files together: profile shape, unique names, `years_of_experience` bounds, location refs resolve, matching-rule DSL parses, and every group reference like `skills.languages.go` resolves to a real entry in the alias files.
@@ -78,7 +77,7 @@ Exit code `0` = OK, exit code `1` = one or more errors printed. The validator ch
 You can also import it from Python:
 
 ```python
-from validate_profiles import validate_profiles, ValidationError
+from verification.validate_profiles import validate_profiles, ValidationError
 errors = validate_profiles()                   # returns list[str], [] = OK
 validate_profiles(raise_on_error=True)         # or raise on any issue
 ```
@@ -91,22 +90,49 @@ python main.py
 
 Press `Ctrl+C` to stop cleanly.
 
-## Debugging a Single Slug — `try_fetch.py`
+## Verification scripts
 
-`try_fetch.py` is a standalone CLI tester for verifying a single `(ats, slug)` pair without spinning up the full pipeline (no DB writes, no loop, no rate limiting). Use it when you suspect a wrong slug, want to inspect what jobhive returns, or want to sanity-check a connector.
+All standalone scripts used to verify or test individual parts of the system live in the **`verification/`** package. Each one is runnable both directly and as a module:
+
+```bash
+python verification/<script>.py          # direct
+python -m verification.<script>          # module form
+```
+
+The scripts are not part of the runtime pipeline (`main.py`). They read project-root files (`config.yml`, `profiles.yaml`, the alias files) using paths resolved relative to the repo root, so they work regardless of which directory you run them from — as long as you run them from inside the repo.
+
+Currently provided:
+
+### `verification/validate_profiles.py`
+
+Validates `profiles.yaml` against `skill_aliases.yml` and `location_aliases.yml`. See the "Two non-negotiable rules" section above — running this after every config edit is mandatory. Importable as `from verification.validate_profiles import validate_profiles, ValidationError`.
+
+### `verification/try_fetch.py`
+
+Standalone CLI tester for verifying a single `(ats, slug)` pair without spinning up the full pipeline (no DB writes, no loop, no rate limiting). Use it when you suspect a wrong slug, want to inspect what jobhive returns, or want to sanity-check a connector.
 
 ```bash
 # Fetch one and print parsed fields (prints all jobs by default)
-python try_fetch.py greenhouse swiggy
+python verification/try_fetch.py greenhouse swiggy
 
 # Optionally cap how many jobs are printed
-python try_fetch.py lever atlassian --limit 5
+python verification/try_fetch.py lever atlassian --limit 5
 
 # Also dump each job's full model_dump JSON (useful for finding field names)
-python try_fetch.py ashby openai --raw --limit 1
+python verification/try_fetch.py ashby openai --raw --limit 1
 
 # Smoke-test a small built-in set of known-good slugs
-python try_fetch.py --examples
+python verification/try_fetch.py --examples
 ```
 
 Exits with code `0` on `status: success`, non-zero otherwise — handy for chaining in shell scripts.
+
+### `verification/audit_slugs.py`
+
+Hits every `(ats, slug)` pair listed in `config.yml` in parallel (8 workers) and reports per-entry status (`OK` / `RATE` / `FAIL`) plus a grouped summary at the end. Use it to bulk-check the company list after a config edit.
+
+```bash
+python verification/audit_slugs.py
+```
+
+> Adding more verification scripts later? Drop them into `verification/`, import project-root code via the same `sys.path` shim used by `audit_slugs.py` / `try_fetch.py`, and link them here.

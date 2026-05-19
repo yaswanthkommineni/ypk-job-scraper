@@ -1,19 +1,29 @@
 """One-shot auditor: hit every (ats, slug) from config.yml and report results.
 
-Run:  python audit_slugs.py
+Run from the project root:
+    python verification/audit_slugs.py
+or equivalently:
+    python -m verification.audit_slugs
 """
 
 from __future__ import annotations
 
+import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import yaml
 
-from main import fetch_live_jobs
+# Resolve project root one level above this file and put it on sys.path so
+# `from main import ...` works whether this script is run directly or via -m.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-CONFIG_PATH = Path(__file__).parent / "config.yml"
+from main import fetch_live_jobs  # noqa: E402  (import after sys.path tweak)
+
+CONFIG_PATH = PROJECT_ROOT / "config.yml"
 WORKERS = 8
 
 

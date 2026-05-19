@@ -1,10 +1,11 @@
 """Validate profiles.yaml against skill_aliases.yml and location_aliases.yml.
 
-USAGE
-    python validate_profiles.py            # validate, exit 0/1, print report
+USAGE (run from the project root)
+    python verification/validate_profiles.py        # exits 0 OK / 1 errors
+    python -m verification.validate_profiles        # equivalent module form
 
 LIBRARY USE
-    from validate_profiles import validate_profiles, ValidationError
+    from verification.validate_profiles import validate_profiles, ValidationError
     errors = validate_profiles()           # returns list[str]; [] means OK
     # or, to raise instead:
     validate_profiles(raise_on_error=True) # raises ValidationError on any issue
@@ -37,10 +38,13 @@ from typing import Any
 
 import yaml
 
-HERE = Path(__file__).parent
-PROFILES_PATH = HERE / "profiles.yaml"
-SKILL_ALIASES_PATH = HERE / "skill_aliases.yml"
-LOCATION_ALIASES_PATH = HERE / "location_aliases.yml"
+# Resolve project root one level above this file so the script works whether
+# it's invoked as `python verification/validate_profiles.py` or as
+# `python -m verification.validate_profiles`, regardless of CWD.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROFILES_PATH = PROJECT_ROOT / "profiles.yaml"
+SKILL_ALIASES_PATH = PROJECT_ROOT / "skill_aliases.yml"
+LOCATION_ALIASES_PATH = PROJECT_ROOT / "location_aliases.yml"
 
 ALLOWED_RULE_TYPES = {"boolean", "scored"}
 ALLOWED_THRESHOLD_KEYS = {"totalscore", "distinct_matches"}
